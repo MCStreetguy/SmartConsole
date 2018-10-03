@@ -18,6 +18,7 @@ use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use MCStreetguy\SmartConsole\Annotations\OptionNameMap;
 use MCStreetguy\SmartConsole\Annotations\ShortName;
+use Webmozart\Console\Api\Args\Format\Option;
 
 class Console extends ApplicationConfig
 {
@@ -62,7 +63,7 @@ class Console extends ApplicationConfig
             Assert::allString($config['commands'], 'Expected an array of commands as string!');
 
             foreach ($config['commands'] as $handlerClass) {
-                $this->analyzeCommand($handlerClass);
+                $this->addCommand($handlerClass);
             }
         }
 
@@ -74,7 +75,7 @@ class Console extends ApplicationConfig
         }
     }
 
-    protected function analyzeCommand(string $class) : CommandConfig
+    public function addCommand(string $class)
     {
         Assert::classExists($class, "The command handler class '$class' does not exist!");
         Assert::subclassOf($class, AbstractCommand::class, "The command handler class '$class' does not inherit from 'MCStreetguy\\SmartConsole\\Command\\AbstractCommand'!");
@@ -129,52 +130,12 @@ class Console extends ApplicationConfig
             }
 
             $params = $method->getParameters();
-            $methodDocBlock = DocBlockFactory::create($method->getDocComment());
-            
-            $shortNameMap = $annotationReader->getMethodAnnotation($method, OptionNameMap::class);
-            if ($shortNameMap !== null) {
-                $shortNameMap = $shortNameMap->getShortNames();
-            }
 
             foreach ($params as $parameter) {
                 $name = $parameter->getName();
-                $flags = Argument::REQUIRED;
                 $description = null;
                 $optionShortName = null;
                 $defaultValue = $parameter->getDefaultValue();
-
-                if ($parameter->hasType()) {
-                    $type = $parameter->getType();
-
-                    switch ($type) {
-                        case 'boolean':
-                            $flags = $flags | Argument::BOOLEAN;
-                            break;
-                        case 'integer':
-                            $flags = $flags | Argument::INTEGER;
-                            break;
-                        case 'double':
-                            $flags = $flags | Argument::FLOAT;
-                            break;
-                        case 'float':
-                            $flags = $flags | Argument::FLOAT;
-                            break;
-                        case 'string':
-                            $flags = $flags | Argument::STRING;
-                            break;
-                        default:
-                            throw new ConfigurationException(
-                                "Argument '$name' in subcommand '$cmdName' has an invalid type!",
-                                1538597361
-                            );
-                    }
-                } else {
-                    $flags = $flags | Argument::STRING;
-                }
-
-                if ($parameter->isVariadic()) {
-                    $flags = $flags | Argument::MULTI_VALUED;
-                }
 
                 $paramTags = $methodDocBlock->getTagsByName('param');
                 $paramTags = array_filter($paramTags, function (Param $elem) use ($name) {
@@ -187,21 +148,87 @@ class Console extends ApplicationConfig
                 }
 
                 if ($parameter->isOptional()) {
-                    $optionShortName = array_filter($shortNameMap, function (ShortName $elem) use ($name) {
-                        return ($elem->getOption() === $name);
-                    });
+                    $optionName = preg_replace_callback('/(?<=.)([A-Z])/', function ($matches) {
+                        return '-' . strtolower($matches[1]);
+                    }, $name);
 
-                    if (!empty($optionShortName)) {
-                        $optionShortName = $optionShortName[0]->getShortName();
+                    $flags = Option::PREFER_LONG_NAME;
+
+                    if ($parameter->hasType()) {
+                        $type = $parameter->getType();
+                    } else {
+                        $type = gettype($defaultValue);
                     }
 
-                    $subCommand->addOption($name, $optionShortName, $flags, $description, $defaultValue);
+                    switch ((string) $type) {
+                        case 'boolean':
+                            $flags = $flags | Option::BOOLEAN | Option::NO_VALUE;
+                            break;
+                        case 'integer':
+                            $flags = $flags | Option::INTEGER | Option::REQUIRED_VALUE;
+                            break;
+                        case 'double':
+                            $flags = $flags | Option::FLOAT | Option::REQUIRED_VALUE;
+                            break;
+                        case 'float':
+                            $flags = $flags | Option::FLOAT | Option::REQUIRED_VALUE;
+                            break;
+                        case 'string':
+                            $flags = $flags | Option::STRING | Option::REQUIRED_VALUE;
+                            break;
+                        default:
+                            throw new ConfigurationException(
+                                "Option '$name' in subcommand '$cmdName' has an invalid type!",
+                                1538600675
+                            );
+                    }
+
+                    if ($parameter->isVariadic()) {
+                        $flags = $flags | Option::MULTI_VALUED;
+                    }
+
+                    $subCommand->addOption($optionName, null, $flags, $description, $defaultValue);
                 } else {
+                    $flags = Argument::REQUIRED;
+
+                    if ($parameter->hasType()) {
+                        $type = $parameter->getType();
+
+                        switch ((string) $type) {
+                            case 'boolean':
+                                $flags = $flags | Argument::BOOLEAN;
+                                break;
+                            case 'integer':
+                                $flags = $flags | Argument::INTEGER;
+                                break;
+                            case 'double':
+                                $flags = $flags | Argument::FLOAT;
+                                break;
+                            case 'float':
+                                $flags = $flags | Argument::FLOAT;
+                                break;
+                            case 'string':
+                                $flags = $flags | Argument::STRING;
+                                break;
+                            default:
+                                throw new ConfigurationException(
+                                    "Argument '$name' in subcommand '$cmdName' has an invalid type!",
+                                    1538597361
+                                );
+                        }
+                    } else {
+                        $flags = $flags | Argument::STRING;
+                    }
+
+                    if ($parameter->isVariadic()) {
+                        $flags = $flags | Argument::MULTI_VALUED;
+                    }
+
                     $subCommand->addArgument($name, $flags, $description, $defaultValue);
                 }
             }
-        }
 
-        return $command;
+            $subCommand->end();
+        }
     }
 }
