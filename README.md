@@ -33,7 +33,7 @@ In this section you find a little guide to your first CLI. If you search for the
 
 ### Basic Setup
 
-To get started we first need to do some basic configuration (yes, we can't completely avoid this step) and tell our application what it's called an so on.
+To get started we first need to do some basic configuration (yes, we can't completely avoid this step) and tell our application what it's called and so on.
 This is done by extending the present `Console`-class like this:
 
 ``` php
@@ -71,12 +71,12 @@ To say a few words about the settings:
 - `displayName` is the beautified name of your application that gets display e.g. on the help page.
 - `commands` is an array of command handler classes.
 
-There are a few more options available but we'll get to this lateron. For now lets focus on the `HelloWorldCommand` we told our application to include.
+There are a [few more options](#reference) available but we'll get to this lateron. For now lets focus on the `HelloWorldCommand` we told our application to include.
 
 ### The binary
 
-Before we can run our CLI we need to create an executable that can be called from the terminal.
-The reason why you still have to build the actual application yourself is to keep SmartConsole as extensible as possible. A preshipped standard executable would prevent this behavior.
+Before we can run our CLI to test it and see what happens, we need to create an executable that can be called from the terminal.
+The reason why you still have to build the actual binary yourself is to keep SmartConsole as extensible as possible. A preshipped standard binary would prevent this.
 
 ``` php
 #!/usr/bin/env php
@@ -99,7 +99,7 @@ That's all we have to do for our binary.
 
 As an alternative to extending the `Console`-class and invoking that child-class you could also create a new instance and configure it from the binary directly as any of the config-methods is public. _Please note_ that this is considered bad practise.
 
-However, for the sake of completeness: the following code would be the exact equivalent to the inheritance-version we produced before.
+However, for the sake of completeness: the following code would be the exact equivalent to the inheritance-version we [produced before](#basic-setup).
 
 ``` php
 # ...
