@@ -10,17 +10,12 @@ use Webmozart\Console\UI\Component\Table;
 use Webmozart\Console\UI\Style\TableStyle;
 use League\CLImate\TerminalObject\Dynamic\Progress;
 
-class IO implements LoggerInterface
+class IO extends RawIO
 {
     /**
      * @var IOApi
      */
     protected $io;
-
-    /**
-     * @var CLImate
-     */
-    protected $climate;
 
     /**
      * @var Progress
@@ -34,160 +29,9 @@ class IO implements LoggerInterface
 
     public function __construct(IOApi $io)
     {
+        parent::__construct();
+
         $this->io = $io;
-        $this->climate = new CLImate;
-    }
-
-    // PSR-Logger Methods
-
-    /**
-     * System is unusable.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function emergency(string $message, array $context = [])
-    {
-        $this->climate->red()->bold()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function alert(string $message, array $context = [])
-    {
-        $this->climate->red()->bold()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function critical(string $message, array $context = [])
-    {
-        $this->climate->red()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function error(string $message, array $context = [])
-    {
-        $this->climate->red()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function warning(string $message, array $context = [])
-    {
-        $this->climate->yellow()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Normal but significant events.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function notice(string $message, array $context = [])
-    {
-        $this->climate->cyan()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function info(string $message, array $context = [])
-    {
-        $this->climate->cyan()->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Detailed debug information.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function debug(string $message, array $context = [])
-    {
-        $this->climate->whisper($this->interpolate($message, $context));
-    }
-
-    /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
-     */
-    public function log($level, $message, array $context = [])
-    {
-        $this->climate->out($this->interpolate($message, $context));
-    }
-
-    /**
-     * Interpolates context values into the message placeholders.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return string
-     */
-    public function interpolate(string $message, array $context = []) : string
-    {
-        $replacements = [];
-
-        foreach ($context as $key => $val) {
-            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                $replacements['{' . $key . '}'] = $val;
-            }
-        }
-
-        return strtr($message, $replacements);
     }
 
     // State-properties
@@ -240,23 +84,6 @@ class IO implements LoggerInterface
     public function isQuiet() : bool
     {
         return $this->io->isQuiet();
-    }
-
-    // Output
-
-    public function success(string $message, array $context = [])
-    {
-        $this->climate->green()->out($this->interpolate($message, $context));
-    }
-
-    public function newline()
-    {
-        $this->climate->br();
-    }
-
-    public function clear()
-    {
-        $this->climate->clear();
     }
 
     // Input

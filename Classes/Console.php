@@ -2,26 +2,65 @@
 
 namespace MCStreetguy\SmartConsole;
 
-use Webmozart\Console\ConsoleApplication;
-use Webmozart\Console\Config\DefaultApplicationConfig as ApplicationConfig;
-use Webmozart\Assert\Assert;
-use MCStreetguy\SmartConsole\Command\AbstractCommand;
-use Webmozart\Console\Api\Config\CommandConfig;
-use phpDocumentor\Reflection\DocBlockFactory;
 use Doctrine\Common\Annotations\AnnotationReader;
-use MCStreetguy\SmartConsole\Annotations\DefaultCommand;
 use MCStreetguy\SmartConsole\Annotations\AnonymousCommand;
-use Webmozart\Console\Api\Args\Format\Argument;
-use League\CLImate\Argument\Argument;
-use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
-use phpDocumentor\Reflection\DocBlock\Tag;
-use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use MCStreetguy\SmartConsole\Annotations\DefaultCommand;
 use MCStreetguy\SmartConsole\Annotations\OptionNameMap;
 use MCStreetguy\SmartConsole\Annotations\ShortName;
+use MCStreetguy\SmartConsole\Command\AbstractCommand;
+use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
+use MCStreetguy\SmartConsole\Utility\RawIO;
+use phpDocumentor\Reflection\DocBlock\Tag;
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use phpDocumentor\Reflection\DocBlockFactory;
+use Webmozart\Assert\Assert;
+use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
+use Webmozart\Console\Api\Config\CommandConfig;
+use Webmozart\Console\Config\DefaultApplicationConfig as ApplicationConfig;
+use Webmozart\Console\ConsoleApplication;
 
 class Console extends ApplicationConfig
 {
+    public static function run()
+    {
+        $config = new static;
+        $config->setTerminateAfterRun(false);
+        $config->setCatchExceptions(false);
+
+        $cli = new ConsoleApplication(new static);
+
+        try {
+            $result = $cli->run();
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            $code = $e->getCode();
+
+            $rawIO = new RawIO;
+            $rawIO->emergency("Fatal: $message (Code: $code)");
+
+            if (is_int($code)) {
+                if ($code > 255) {
+                    $code = 255;
+                }
+
+                exit($code);
+            }
+
+            exit(1);
+        } finally {
+            if (is_int($result)) {
+                if ($result > 255) {
+                    $result = 255;
+                }
+
+                exit($result);
+            }
+
+            exit(0);
+        }
+    }
+
     /**
      * Configures the application.
      *
@@ -29,7 +68,7 @@ class Console extends ApplicationConfig
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function configure(array $config)
+    public function init(array $config)
     {
         Assert::keyExists($config, 'name', 'The console application requires a name!');
         Assert::string($config['name'], 'Expected a string as application name, got %s!');
@@ -39,9 +78,6 @@ class Console extends ApplicationConfig
 
         $this->setName($config['name']);
         $this->setVersion($config['version']);
-        
-        $this->setTerminateAfterRun(true);
-        $this->setCatchExceptions(false);
 
         if (array_key_exists('displayName', $config)) {
             Assert::string($config['displayName'], 'Expected a string as display name, got %s');

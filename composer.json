@@ -2,6 +2,14 @@
     "name": "mcstreetguy/smart-console",
     "description": "The smarter php console toolkit.",
     "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Maximilian Schmidt",
+            "email": "maximilianschmidt404@gmail.com"
+        }
+    ],
+    "minimum-stability": "beta",
     "require": {
         "webmozart/console": "^1.0@beta",
         "league/climate": "^3.4",
@@ -13,12 +21,14 @@
     "require-dev": {
         "kint-php/kint": "^3.0"
     },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Maximilian Schmidt",
-            "email": "maximilianschmidt404@gmail.com"
+    "autoload": {
+        "psr-4": {
+            "MCStreetguy\\SmartConsole\\": "Classes/"
         }
-    ],
-    "minimum-stability": "beta"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MCStreetguy\\SmartConsole\\Test\\": "Test/Classes/"
+        }
+    }
 }

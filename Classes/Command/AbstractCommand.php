@@ -15,10 +15,10 @@ abstract class AbstractCommand
      */
     protected $io;
 
-    /**
-     * @var Args
-     */
-    protected $args;
+    // /**
+    //  * @var Args
+    //  */
+    // protected $args;
 
     final public function __construct()
     {
@@ -52,7 +52,36 @@ abstract class AbstractCommand
     final public function invoke(ArgsApi $args, IOApi $io, string $name) : int
     {
         $this->io = new IO($io);
-        $this->args = new Args($args);
+        // $this->args = new Args($args);
+
+        $reflector = new \ReflectionMethod(static::class . '::' . $name);
+
+        $params = $reflector->getParameters();
+        $arguments = [];
+
+        foreach ($params as $parameter) {
+            $param = $parameter->getName();
+
+            if ($parameter->isOptional()) {
+                $optionName = preg_replace_callback('/(?<=.)([A-Z])/', function ($matches) {
+                    return '-' . strtolower($matches[1]);
+                }, $param);
+
+                $arguments[] = $args->getOption($optionName);
+            } else {
+                $arguments[] = $args->getArgument($param);
+            }
+        }
+
+        $result = call_user_func_array([$this, $name], $arguments);
+
+        if (is_int($result)) {
+            if ($result > 255) {
+                $result = 255;
+            }
+
+            return $result;
+        }
 
         return 0;
     }
