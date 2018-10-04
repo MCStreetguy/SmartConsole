@@ -193,3 +193,11 @@ AVAILABLE COMMANDS
 
 ```
 
+Wow, that was easy huh? Like this you define all your commands, their options, arguments and help-texts. Even very complex commands do not require any more configuration than you've already written.
+
+### The analysis algorithm
+
+Below you find a detailled explanation on how the analysis algorithm of SmartConsole works.
+This is to prevent configuration errors of your commands since any information is retrieved from the class directly.
+
+_(to be written)_
