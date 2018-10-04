@@ -171,6 +171,11 @@ class RawIO implements LoggerInterface
 
     // Output
 
+    public function out(string $message, array $context = [])
+    {
+        $this->climate->out($this->interpolate($message, $context));
+    }
+
     public function success(string $message, array $context = [])
     {
         $this->climate->green()->out($this->interpolate($message, $context));

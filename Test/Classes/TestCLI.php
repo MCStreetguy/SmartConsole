@@ -11,12 +11,11 @@ class TestCLI extends Console
         parent::configure();
 
         $this->init([
-            'name' => 'test-app',
+            'name' => 'my-application',
             'version' => '0.0.0-alpha',
-            'displayName' => 'Test App',
-            'debugMode' => true,
+            'displayName' => 'My Application',
             'commands' => [
-                TestCommand::class
+                HelloWorldCommand::class
             ]
         ]);
     }

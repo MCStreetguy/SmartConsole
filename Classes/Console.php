@@ -33,12 +33,14 @@ class Console extends DefaultApplicationConfig
         $config->setTerminateAfterRun(false);
         $config->setCatchExceptions(false);
 
+        $code = 0;
+
         try {
             $cli = new ConsoleApplication(new static);
-            $code = $cli->run();
+            $result = $cli->run();
 
-            if (empty($code) || !is_int($code)) {
-                $code = 1;
+            if (!empty($result) && is_int($result)) {
+                $code = $result;
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
@@ -179,21 +181,21 @@ class Console extends DefaultApplicationConfig
                         $subCommand->markAnonymous();
                     }
                 }
+
+                $methodDocBlock = $method->getDocComment();
+                
+                Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
+
+                $methodDocBlock = $docBlockFactory->create($methodDocBlock);
+
+                $commandDescription = $methodDocBlock->getSummary();
+
+                if (!empty($cmdDesc = (string) $methodDocBlock->getDescription())) {
+                    $commandDescription .= PHP_EOL . $cmdDesc;
+                }
+
+                $subCommand->setDescription($commandDescription);
             }
-
-            $methodDocBlock = $method->getDocComment();
-            
-            Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
-
-            $methodDocBlock = $docBlockFactory->create($methodDocBlock);
-
-            $commandDescription = $methodDocBlock->getSummary();
-
-            if (!empty($cmdDesc = (string) $methodDocBlock->getDescription())) {
-                $commandDescription .= PHP_EOL . $cmdDesc;
-            }
-
-            $subCommand->setDescription($commandDescription);
 
             $params = $method->getParameters();
 
