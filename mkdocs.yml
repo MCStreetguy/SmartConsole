@@ -1,0 +1,38 @@
+site_name: Melior Framework
+site_description: The official documentation of Melior Framework.
+site_author: Maximilian Schmidt
+site_url: https://melior.mcstreetguy.de
+
+copyright: Copyright &copy; 2018 Maximilian Schmidt
+
+docs_dir: Docs
+
+theme:
+  name: readthedocs
+  highlightjs: false
+
+extra_css:
+  - css/custom.css
+
+markdown_extensions:
+  - admonition
+  - 
+    codehilite:
+      linenums: false
+  - 
+    toc:
+      permalink: true
+  - meta
+  - 
+    pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tilde
+
+pages:
+  - Introduction: index.md
+  - Usage Guide: usage.md

@@ -1,0 +1,492 @@
+div[role="main"] {
+    margin-bottom: 25px;
+}
+
+div.admonition {
+    background: rgba(236, 236, 236, 0.5);
+    padding: 12px;
+}
+
+div.admonition>p:not(.admonition-title) {
+    margin-bottom: 0;
+}
+
+div.codehilite {
+    position: relative;
+    margin: 1em 0;
+    padding: 0;
+    border-radius: 0.2rem;
+    background-color: rgba(236, 236, 236, 0.5);
+    color: #37474F;
+    line-height: 1.4;
+    -webkit-overflow-scrolling: touch;
+    font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+}
+
+div.codehilite>pre {
+    display: block;
+    margin: 0;
+    padding: 1.05rem 1.2rem;
+    background-color: transparent;
+    overflow: auto;
+    vertical-align: top;
+    position: relative;
+    border-radius: 0.2rem;
+    line-height: 1.4;
+    -webkit-overflow-scrolling: touch;
+    color: #37474F;
+    font-size: 85%;
+    direction: ltr;
+    padding-top: 0;
+}
+
+div.codehilite>pre>span.cp {
+    display: none;
+}
+
+div.codehilite>pre>span {
+    font-weight: normal;
+}
+
+.codehilite .o,
+.md-typeset .highlight .o {
+    color: inherit;
+}
+
+.codehilite .ow,
+.md-typeset .highlight .ow {
+    color: inherit;
+}
+
+.codehilite .ge,
+.md-typeset .highlight .ge {
+    color: #000000;
+}
+
+.codehilite .gr,
+.md-typeset .highlight .gr {
+    color: #AA0000;
+}
+
+.codehilite .gh,
+.md-typeset .highlight .gh {
+    color: #999999;
+}
+
+.codehilite .go,
+.md-typeset .highlight .go {
+    color: #888888;
+}
+
+.codehilite .gp,
+.md-typeset .highlight .gp {
+    color: #555555;
+}
+
+.codehilite .gs,
+.md-typeset .highlight .gs {
+    color: inherit;
+}
+
+.codehilite .gu,
+.md-typeset .highlight .gu {
+    color: #AAAAAA;
+}
+
+.codehilite .gt,
+.md-typeset .highlight .gt {
+    color: #AA0000;
+}
+
+.codehilite .gd,
+.md-typeset .highlight .gd {
+    background-color: #FFDDDD;
+}
+
+.codehilite .gi,
+.md-typeset .highlight .gi {
+    background-color: #DDFFDD;
+}
+
+.codehilite .k,
+.md-typeset .highlight .k {
+    color: #3B78E7;
+}
+
+.codehilite .kc,
+.md-typeset .highlight .kc {
+    color: #A71D5D;
+}
+
+.codehilite .kd,
+.md-typeset .highlight .kd {
+    color: #3B78E7;
+}
+
+.codehilite .kn,
+.md-typeset .highlight .kn {
+    color: #3B78E7;
+}
+
+.codehilite .kp,
+.md-typeset .highlight .kp {
+    color: #A71D5D;
+}
+
+.codehilite .kr,
+.md-typeset .highlight .kr {
+    color: #3E61A2;
+}
+
+.codehilite .kt,
+.md-typeset .highlight .kt {
+    color: #3E61A2;
+}
+
+.codehilite .c,
+.md-typeset .highlight .c {
+    color: #999999;
+}
+
+.codehilite .cm,
+.md-typeset .highlight .cm {
+    color: #999999;
+}
+
+.codehilite .cp,
+.md-typeset .highlight .cp {
+    color: #666666;
+}
+
+.codehilite .c1,
+.md-typeset .highlight .c1 {
+    color: #999999;
+}
+
+.codehilite .ch,
+.md-typeset .highlight .ch {
+    color: #999999;
+}
+
+.codehilite .cs,
+.md-typeset .highlight .cs {
+    color: #999999;
+}
+
+.codehilite .na,
+.md-typeset .highlight .na {
+    color: #C2185B;
+}
+
+.codehilite .nb,
+.md-typeset .highlight .nb {
+    color: #C2185B;
+}
+
+.codehilite .bp,
+.md-typeset .highlight .bp {
+    color: #3E61A2;
+}
+
+.codehilite .nc,
+.md-typeset .highlight .nc {
+    color: #C2185B;
+}
+
+.codehilite .no,
+.md-typeset .highlight .no {
+    color: #3E61A2;
+}
+
+.codehilite .nd,
+.md-typeset .highlight .nd {
+    color: #666666;
+}
+
+.codehilite .ni,
+.md-typeset .highlight .ni {
+    color: #666666;
+}
+
+.codehilite .ne,
+.md-typeset .highlight .ne {
+    color: #C2185B;
+}
+
+.codehilite .nf,
+.md-typeset .highlight .nf {
+    color: #C2185B;
+}
+
+.codehilite .nl,
+.md-typeset .highlight .nl {
+    color: #3B5179;
+}
+
+.codehilite .nn,
+.md-typeset .highlight .nn {
+    color: #EC407A;
+}
+
+.codehilite .nt,
+.md-typeset .highlight .nt {
+    color: #3B78E7;
+}
+
+.codehilite .nv,
+.md-typeset .highlight .nv {
+    color: #3E61A2;
+}
+
+.codehilite .vc,
+.md-typeset .highlight .vc {
+    color: #3E61A2;
+}
+
+.codehilite .vg,
+.md-typeset .highlight .vg {
+    color: #3E61A2;
+}
+
+.codehilite .vi,
+.md-typeset .highlight .vi {
+    color: #3E61A2;
+}
+
+.codehilite .nx,
+.md-typeset .highlight .nx {
+    color: #EC407A;
+}
+
+.codehilite .m,
+.md-typeset .highlight .m {
+    color: #E74C3C;
+}
+
+.codehilite .mf,
+.md-typeset .highlight .mf {
+    color: #E74C3C;
+}
+
+.codehilite .mh,
+.md-typeset .highlight .mh {
+    color: #E74C3C;
+}
+
+.codehilite .mi,
+.md-typeset .highlight .mi {
+    color: #E74C3C;
+}
+
+.codehilite .il,
+.md-typeset .highlight .il {
+    color: #E74C3C;
+}
+
+.codehilite .mo,
+.md-typeset .highlight .mo {
+    color: #E74C3C;
+}
+
+.codehilite .s,
+.md-typeset .highlight .s {
+    color: #0D904F;
+}
+
+.codehilite .sb,
+.md-typeset .highlight .sb {
+    color: #0D904F;
+}
+
+.codehilite .sc,
+.md-typeset .highlight .sc {
+    color: #0D904F;
+}
+
+.codehilite .sd,
+.md-typeset .highlight .sd {
+    color: #999999;
+}
+
+.codehilite .s2,
+.md-typeset .highlight .s2 {
+    color: #0D904F;
+}
+
+.codehilite .se,
+.md-typeset .highlight .se {
+    color: #183691;
+}
+
+.codehilite .sh,
+.md-typeset .highlight .sh {
+    color: #183691;
+}
+
+.codehilite .si,
+.md-typeset .highlight .si {
+    color: #183691;
+}
+
+.codehilite .sx,
+.md-typeset .highlight .sx {
+    color: #183691;
+}
+
+.codehilite .sr,
+.md-typeset .highlight .sr {
+    color: #009926;
+}
+
+.codehilite .s1,
+.md-typeset .highlight .s1 {
+    color: #0D904F;
+}
+
+.codehilite .ss,
+.md-typeset .highlight .ss {
+    color: #0D904F;
+}
+
+.codehilite .err,
+.md-typeset .highlight .err {
+    color: #A61717;
+}
+
+.codehilite .w,
+.md-typeset .highlight .w {
+    color: transparent;
+}
+
+.codehilite .hll,
+.md-typeset .highlight .hll {
+    display: block;
+    margin: 0 -1.2rem;
+    padding: 0 1.2rem;
+    background-color: rgba(255, 235, 59, 0.5);
+}
+
+.md-typeset .codehilite,
+.md-typeset .highlight {
+    position: relative;
+    margin: 1em 0;
+    padding: 0;
+    border-radius: 0.2rem;
+    background-color: rgba(236, 236, 236, 0.5);
+    color: #37474F;
+    line-height: 1.4;
+    -webkit-overflow-scrolling: touch;
+}
+
+.md-typeset .codehilite pre,
+.md-typeset .highlight pre,
+.md-typeset .codehilite code,
+.md-typeset .highlight code {
+    display: block;
+    margin: 0;
+    padding: 1.05rem 1.2rem;
+    background-color: transparent;
+    overflow: auto;
+    vertical-align: top;
+}
+
+.md-typeset .codehilite pre::-webkit-scrollbar,
+.md-typeset .highlight pre::-webkit-scrollbar,
+.md-typeset .codehilite code::-webkit-scrollbar,
+.md-typeset .highlight code::-webkit-scrollbar {
+    width: 0.4rem;
+    height: 0.4rem;
+}
+
+.md-typeset .codehilite pre::-webkit-scrollbar-thumb,
+.md-typeset .highlight pre::-webkit-scrollbar-thumb,
+.md-typeset .codehilite code::-webkit-scrollbar-thumb,
+.md-typeset .highlight code::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.26);
+}
+
+.md-typeset .codehilite pre::-webkit-scrollbar-thumb:hover,
+.md-typeset .highlight pre::-webkit-scrollbar-thumb:hover,
+.md-typeset .codehilite code::-webkit-scrollbar-thumb:hover,
+.md-typeset .highlight code::-webkit-scrollbar-thumb:hover {
+    background-color: #536dfe;
+}
+
+.md-typeset pre.codehilite,
+.md-typeset pre.highlight {
+    overflow: visible;
+}
+
+.md-typeset pre.codehilite code,
+.md-typeset pre.highlight code {
+    display: block;
+    padding: 1.05rem 1.2rem;
+    overflow: auto;
+}
+
+.md-typeset .codehilitetable,
+.md-typeset .highlighttable {
+    display: block;
+    margin: 1em 0;
+    border-radius: 0.2em;
+    font-size: 1.6rem;
+    overflow: hidden;
+}
+
+.md-typeset .codehilitetable tbody,
+.md-typeset .highlighttable tbody,
+.md-typeset .codehilitetable td,
+.md-typeset .highlighttable td {
+    display: block;
+    padding: 0;
+}
+
+.md-typeset .codehilitetable tr,
+.md-typeset .highlighttable tr {
+    display: flex;
+}
+
+.md-typeset .codehilitetable .codehilite,
+.md-typeset .highlighttable .codehilite,
+.md-typeset .codehilitetable .highlight,
+.md-typeset .highlighttable .highlight,
+.md-typeset .codehilitetable .linenodiv,
+.md-typeset .highlighttable .linenodiv {
+    margin: 0;
+    border-radius: 0;
+}
+
+.md-typeset .codehilitetable .linenodiv,
+.md-typeset .highlighttable .linenodiv {
+    padding: 1.05rem 1.2rem;
+}
+
+.md-typeset .codehilitetable .linenos,
+.md-typeset .highlighttable .linenos {
+    background-color: rgba(0, 0, 0, 0.07);
+    color: rgba(0, 0, 0, 0.26);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.md-typeset .codehilitetable .linenos pre,
+.md-typeset .highlighttable .linenos pre {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    color: inherit;
+    text-align: right;
+}
+
+.md-typeset .codehilitetable .code,
+.md-typeset .highlighttable .code {
+    flex: 1;
+    overflow: hidden;
+}
+
+.md-typeset>.codehilitetable,
+.md-typeset>.highlighttable {
+    box-shadow: none;
+}
