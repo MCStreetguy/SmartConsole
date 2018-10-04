@@ -3,6 +3,7 @@
 namespace MCStreetguy\SmartConsole\Utility;
 
 use League\CLImate\CLImate;
+use Psr\Log\LoggerInterface;
 
 class RawIO implements LoggerInterface
 {
@@ -26,7 +27,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function emergency(string $message, array $context = [])
+    public function emergency($message, array $context = [])
     {
         $this->climate->red()->bold()->out($this->interpolate($message, $context));
     }
@@ -42,7 +43,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function alert(string $message, array $context = [])
+    public function alert($message, array $context = [])
     {
         $this->climate->red()->bold()->out($this->interpolate($message, $context));
     }
@@ -57,7 +58,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function critical(string $message, array $context = [])
+    public function critical($message, array $context = [])
     {
         $this->climate->red()->out($this->interpolate($message, $context));
     }
@@ -71,7 +72,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function error(string $message, array $context = [])
+    public function error($message, array $context = [])
     {
         $this->climate->red()->out($this->interpolate($message, $context));
     }
@@ -87,7 +88,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function warning(string $message, array $context = [])
+    public function warning($message, array $context = [])
     {
         $this->climate->yellow()->out($this->interpolate($message, $context));
     }
@@ -100,7 +101,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function notice(string $message, array $context = [])
+    public function notice($message, array $context = [])
     {
         $this->climate->cyan()->out($this->interpolate($message, $context));
     }
@@ -115,7 +116,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function info(string $message, array $context = [])
+    public function info($message, array $context = [])
     {
         $this->climate->cyan()->out($this->interpolate($message, $context));
     }
@@ -128,7 +129,7 @@ class RawIO implements LoggerInterface
      *
      * @return void
      */
-    public function debug(string $message, array $context = [])
+    public function debug($message, array $context = [])
     {
         $this->climate->whisper($this->interpolate($message, $context));
     }

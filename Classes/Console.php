@@ -17,22 +17,29 @@ use Webmozart\Assert\Assert;
 use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
 use Webmozart\Console\Api\Config\CommandConfig;
-use Webmozart\Console\Config\DefaultApplicationConfig as ApplicationConfig;
+use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
+use Webmozart\Console\Api\Config\ApplicationConfig;
 
-class Console extends ApplicationConfig
+class Console extends DefaultApplicationConfig
 {
-    public static function run()
+    public static function run(ApplicationConfig $config = null)
     {
-        $config = new static;
+        if ($config === null) {
+            $config = new static;
+        }
+
         $config->setTerminateAfterRun(false);
         $config->setCatchExceptions(false);
 
-        $cli = new ConsoleApplication(new static);
-
         try {
-            $result = $cli->run();
+            $cli = new ConsoleApplication(new static);
+            $code = $cli->run();
+
+            if (empty($code) || !is_int($code)) {
+                $code = 1;
+            }
         } catch (\Exception $e) {
             $message = $e->getMessage();
             $code = $e->getCode();
@@ -40,26 +47,21 @@ class Console extends ApplicationConfig
             $rawIO = new RawIO;
             $rawIO->emergency("Fatal: $message (Code: $code)");
 
-            if (is_int($code)) {
-                if ($code > 255) {
-                    $code = 255;
-                }
-
-                exit($code);
+            if (empty($code) || !is_int($code)) {
+                $code = 1;
             }
-
-            exit(1);
         } finally {
-            if (is_int($result)) {
-                if ($result > 255) {
-                    $result = 255;
-                }
-
-                exit($result);
+            if (is_int($code) && $code > 255) {
+                $code = 255;
             }
 
-            exit(0);
+            exit($code);
         }
+    }
+
+    public function execute()
+    {
+        static::run($this);
     }
 
     /**
@@ -156,7 +158,7 @@ class Console extends ApplicationConfig
 
         Assert::notEmpty($actionMethods, "The command handler class '$class' defines no valid action methods!");
 
-        $isSimpleCommand = (count($methods) === 1);
+        $isSimpleCommand = (count($actionMethods) === 1);
 
         $annotationReader = new AnnotationReader();
 

@@ -5,7 +5,7 @@ namespace MCStreetguy\SmartConsole\Test;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 
 /**
- * Test for general functionality.
+ * Print 'Hello World!' to the terminal.
  */
 class TestCommand extends AbstractCommand
 {
@@ -15,20 +15,5 @@ class TestCommand extends AbstractCommand
     public function demoAction()
     {
         $this->io->success('Hello World!');
-    }
-
-    /**
-     * List some demo stuff.
-     *
-     * @param string $filter Apply the given filter to the listing.
-     * @param bool $someOption Trigger some alternate action.
-     */
-    public function listAction(string $filter, bool $someOption = false)
-    {
-        if ($someOption === true) {
-            $this->io->warning($filter);
-        } else {
-            $this->io->notice($filter);
-        }
     }
 }

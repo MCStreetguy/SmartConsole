@@ -7,6 +7,7 @@ use Webmozart\Console\Api\IO\IO as IOApi;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
 use MCStreetguy\SmartConsole\Utility\IO;
 use MCStreetguy\SmartConsole\Utility\Args;
+use Webmozart\Console\Api\Command\Command;
 
 abstract class AbstractCommand
 {
@@ -49,7 +50,7 @@ abstract class AbstractCommand
         return call_user_func_array([$this, $name], $arguments);
     }
 
-    final public function invoke(ArgsApi $args, IOApi $io, string $name) : int
+    final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
         $this->io = new IO($io);
         // $this->args = new Args($args);
