@@ -14,7 +14,7 @@ _That's over now!_ SmartConsole is the first console toolkit for PHP that you ha
 All you do is write classes as you are used to and document them properly.
 Smart Console analyzes your command handlers and makes all settings automatically so you can sit back and concentrate on your real goal.
 
-SmartConsole is wrapped around the great [webmozart/console](https://github.com/webmozart/console) package and its approach is based on the CLI of the ingenious Neos CMS.
+SmartConsole is wrapped around the great [webmozart/console](https://github.com/webmozart/console) package and its approach is based on the CLI of the ingenious [Neos CMS](https://www.neos.io/).
 Besides it merges together some of the basic functionalities from the underlying console-package and advanced features like progress-bars from [CLImate](https://climate.thephpleague.com/).
 
 Read on to learn more about how to use it.
