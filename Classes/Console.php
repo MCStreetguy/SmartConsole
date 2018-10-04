@@ -19,6 +19,7 @@ use Webmozart\Console\Api\Args\Format\Option;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig as ApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
+use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 
 class Console extends ApplicationConfig
 {
@@ -123,11 +124,24 @@ class Console extends ApplicationConfig
         Assert::endsWith($className, 'Command', "The command handler class '$class' has an invalid name!");
 
         $commandName = str_replace('Command', '', $className);
+        $commandName = StringHelper::camelToSnakeCase($commandName);
+
         $command = $this->beginCommand($commandName);
 
-        $classDocBlock = DocBlockFactory::create($reflector->getDocComment());
+        $classDocBlock = $reflector->getDocComment();
 
-        $command->setDescription($classDocBlock->getDescription());
+        Assert::notEmpty($classDocBlock, "The command handler class '$class' is missing a descriptive docblock!");
+
+        $docBlockFactory = DocBlockFactory::createInstance();
+        $classDocBlock = $docBlockFactory->create($classDocBlock);
+
+        $description = $classDocBlock->getSummary();
+
+        if (!empty($docDesc = (string) $classDocBlock->getDescription())) {
+            $description .= PHP_EOL . $docDesc;
+        }
+
+        $command->setDescription($description);
         $command->setHandler(function () use ($class) {
             return new $class;
         });
@@ -149,7 +163,7 @@ class Console extends ApplicationConfig
         foreach ($actionMethods as $method) {
             $cmdName = str_replace('Action', '', $method->getName());
 
-            $subCommand = $command->beginSubCommand($cmdName);
+            $subCommand = $command->beginSubCommand(StringHelper::camelToSnakeCase($cmdName));
             $subCommand->setHandlerMethod("${cmdName}Cmd");
 
             if ($isSimpleCommand === true) {
@@ -165,40 +179,62 @@ class Console extends ApplicationConfig
                 }
             }
 
+            $methodDocBlock = $method->getDocComment();
+            
+            Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
+
+            $methodDocBlock = $docBlockFactory->create($methodDocBlock);
+
+            $commandDescription = $methodDocBlock->getSummary();
+
+            if (!empty($cmdDesc = (string) $methodDocBlock->getDescription())) {
+                $commandDescription .= PHP_EOL . $cmdDesc;
+            }
+
+            $subCommand->setDescription($commandDescription);
+
             $params = $method->getParameters();
 
             foreach ($params as $parameter) {
                 $name = $parameter->getName();
                 $description = null;
                 $optionShortName = null;
-                $defaultValue = $parameter->getDefaultValue();
 
                 $paramTags = $methodDocBlock->getTagsByName('param');
-                $paramTags = array_filter($paramTags, function (Param $elem) use ($name) {
+                $paramTags = array_values(array_filter($paramTags, function (Param $elem) use ($name) {
                     return ($elem->getVariableName() === $name);
-                });
+                }));
 
                 if (!empty($paramTags)) {
                     $paramTag = $paramTags[0];
-                    $description = $paramTag->getDescription();
+                    $description = (string) $paramTag->getDescription();
                 }
 
                 if ($parameter->isOptional()) {
-                    $optionName = preg_replace_callback('/(?<=.)([A-Z])/', function ($matches) {
-                        return '-' . strtolower($matches[1]);
-                    }, $name);
+                    $defaultValue = $parameter->getDefaultValue();
+
+                    $optionName = StringHelper::camelToSnakeCase($name);
 
                     $flags = Option::PREFER_LONG_NAME;
 
                     if ($parameter->hasType()) {
                         $type = $parameter->getType();
+                        $type = $type->getName();
                     } else {
                         $type = gettype($defaultValue);
                     }
 
-                    switch ((string) $type) {
+                    switch ($type) {
+                        case 'bool':
+                            $flags = $flags | Option::BOOLEAN | Option::NO_VALUE;
+                            $defaultValue = null;
+                            break;
                         case 'boolean':
                             $flags = $flags | Option::BOOLEAN | Option::NO_VALUE;
+                            $defaultValue = null;
+                            break;
+                        case 'int':
+                            $flags = $flags | Option::INTEGER | Option::REQUIRED_VALUE;
                             break;
                         case 'integer':
                             $flags = $flags | Option::INTEGER | Option::REQUIRED_VALUE;
@@ -260,7 +296,7 @@ class Console extends ApplicationConfig
                         $flags = $flags | Argument::MULTI_VALUED;
                     }
 
-                    $subCommand->addArgument($name, $flags, $description, $defaultValue);
+                    $subCommand->addArgument($name, $flags, $description);
                 }
             }
 
