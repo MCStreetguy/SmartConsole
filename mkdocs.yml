@@ -1,7 +1,7 @@
-site_name: Melior Framework
-site_description: The official documentation of Melior Framework.
+site_name: SmartConsole
+site_description: The official documentation of SmartConsole.
 site_author: Maximilian Schmidt
-site_url: https://melior.mcstreetguy.de
+site_url: https://smartconsole.readthedocs.io
 
 copyright: Copyright &copy; 2018 Maximilian Schmidt
 
@@ -36,3 +36,5 @@ markdown_extensions:
 pages:
   - Introduction: index.md
   - Usage Guide: usage.md
+  - Reference: references.md
+  - Examples: examples.md
