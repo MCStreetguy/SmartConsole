@@ -3,10 +3,6 @@
 namespace MCStreetguy\SmartConsole;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use MCStreetguy\SmartConsole\Annotations\AnonymousCommand;
-use MCStreetguy\SmartConsole\Annotations\DefaultCommand;
-use MCStreetguy\SmartConsole\Annotations\OptionNameMap;
-use MCStreetguy\SmartConsole\Annotations\ShortName;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
 use MCStreetguy\SmartConsole\Utility\RawIO;
@@ -22,18 +18,29 @@ use Webmozart\Console\ConsoleApplication;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use Webmozart\Console\Api\Config\ApplicationConfig;
 use DI\ContainerBuilder;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 class Console extends DefaultApplicationConfig
 {
     /**
      * @var Container
      */
-    private $container;
+    protected $container;
+
+    /**
+     * @var AnnotationReader
+     */
+    protected $annotationReader;
+
+    /**
+     * @var DocBlockFactory
+     */
+    protected $docBlockFactory;
 
     public static function run(ApplicationConfig $config = null)
     {
         if ($config === null) {
-            $config = new static;
+            $config = new static();
         }
 
         $config->setTerminateAfterRun(false);
@@ -41,8 +48,13 @@ class Console extends DefaultApplicationConfig
 
         $code = 0;
 
+        $cli = new ConsoleApplication($config);
+        $result = $cli->run();
+        exit;
+
+
         try {
-            $cli = new ConsoleApplication(new static);
+            $cli = new ConsoleApplication($config);
             $result = $cli->run();
 
             if (!empty($result) && is_int($result)) {
@@ -77,13 +89,18 @@ class Console extends DefaultApplicationConfig
      */
     public function __construct($name = null, $version = null)
     {
-        parent::__construct($name, $version);
-
         $factory = new ContainerBuilder();
         $factory->useAnnotations(true);
         $factory->useAutowiring(true);
-
+        
         $this->container = $factory->build();
+
+        AnnotationRegistry::registerLoader('class_exists');
+        $this->annotationReader = new AnnotationReader();
+
+        $this->docBlockFactory = DocBlockFactory::createInstance();
+
+        parent::__construct($name, $version);
     }
 
     /**
@@ -156,8 +173,7 @@ class Console extends DefaultApplicationConfig
 
         Assert::notEmpty($classDocBlock, "The command handler class '$class' is missing a descriptive docblock!");
 
-        $docBlockFactory = DocBlockFactory::createInstance();
-        $classDocBlock = $docBlockFactory->create($classDocBlock);
+        $classDocBlock = $this->docBlockFactory->create($classDocBlock);
 
         $description = $classDocBlock->getSummary();
 
@@ -184,8 +200,6 @@ class Console extends DefaultApplicationConfig
 
         $isSimpleCommand = (count($actionMethods) === 1);
 
-        $annotationReader = new AnnotationReader();
-
         foreach ($actionMethods as $method) {
             $cmdName = str_replace('Action', '', $method->getName());
 
@@ -196,10 +210,10 @@ class Console extends DefaultApplicationConfig
                 $subCommand->markDefault();
                 $subCommand->markAnonymous();
             } else {
-                if ($annotationReader->getMethodAnnotation($method, DefaultCommand::class) !== null) {
+                if ($this->annotationReader->getMethodAnnotation($method, CLI\DefaultCommand::class) !== null) {
                     $subCommand->markDefault();
 
-                    if ($annotationReader->getMethodAnnotation($method, AnonymousCommand::class) !== null) {
+                    if ($this->annotationReader->getMethodAnnotation($method, CLI\AnonymousCommand::class) !== null) {
                         $subCommand->markAnonymous();
                     }
                 }
@@ -208,7 +222,7 @@ class Console extends DefaultApplicationConfig
                 
                 Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
 
-                $methodDocBlock = $docBlockFactory->create($methodDocBlock);
+                $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
 
                 $commandDescription = $methodDocBlock->getSummary();
 
