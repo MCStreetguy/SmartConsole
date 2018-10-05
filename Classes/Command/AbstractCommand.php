@@ -16,10 +16,10 @@ abstract class AbstractCommand
      */
     protected $io;
 
-    // /**
-    //  * @var Args
-    //  */
-    // protected $args;
+    /**
+     * @var Args
+     */
+    protected $args;
 
     final public function __construct()
     {
@@ -53,7 +53,7 @@ abstract class AbstractCommand
     final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
         $this->io = new IO($io);
-        // $this->args = new Args($args);
+        $this->args = new Args($args);
 
         $reflector = new \ReflectionMethod(static::class . '::' . $name);
 
