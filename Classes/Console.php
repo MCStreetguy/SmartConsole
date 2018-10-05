@@ -21,9 +21,15 @@ use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use Webmozart\Console\Api\Config\ApplicationConfig;
+use DI\ContainerBuilder;
 
 class Console extends DefaultApplicationConfig
 {
+    /**
+     * @var Container
+     */
+    private $container;
+
     public static function run(ApplicationConfig $config = null)
     {
         if ($config === null) {
@@ -64,6 +70,20 @@ class Console extends DefaultApplicationConfig
     public function execute()
     {
         static::run($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct($name = null, $version = null)
+    {
+        parent::__construct($name, $version);
+
+        $factory = new ContainerBuilder();
+        $factory->useAnnotations(true);
+        $factory->useAutowiring(true);
+
+        $this->container = $factory->build();
     }
 
     /**
@@ -146,8 +166,10 @@ class Console extends DefaultApplicationConfig
         }
 
         $command->setDescription($description);
-        $command->setHandler(function () use ($class) {
-            return new $class;
+
+        $container = &$this->container;
+        $command->setHandler(function () use ($class, $container) {
+            return $container->get($class);
         });
 
         $methods = $reflector->getMethods(\ReflectionMethod::IS_PUBLIC | ~\ReflectionMethod::IS_STATIC);
