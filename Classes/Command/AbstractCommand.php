@@ -21,13 +21,6 @@ abstract class AbstractCommand
      */
     protected $args;
 
-    final public function __construct()
-    {
-        if (method_exists($this, 'initialize')) {
-            $this->initialize();
-        }
-    }
-
     final public function __call($name, $arguments)
     {
         if ($name === 'handle') {
