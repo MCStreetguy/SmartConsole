@@ -10,7 +10,7 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
 [![GitHub top language](https://img.shields.io/github/languages/top/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
 [![GitHub contributors](https://img.shields.io/github/contributors/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/MCStreetguy/SmartConsole.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FMCStreetguy%2FSmartConsole)
+<!-- [![Twitter](https://img.shields.io/twitter/url/https/github.com/MCStreetguy/SmartConsole.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FMCStreetguy%2FSmartConsole) -->
 [![Documentation Status](https://readthedocs.org/projects/smartconsole/badge/?version=latest)](https://smartconsole.readthedocs.io/en/latest/?badge=latest)
 
 Have you ever wondered why it is so complicated to write a console application in PHP?

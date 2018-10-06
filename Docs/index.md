@@ -4,13 +4,13 @@
 [![GitHub forks](https://img.shields.io/github/forks/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole/network)
 [![GitHub stars](https://img.shields.io/github/stars/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole/stargazers)
 [![GitHub license](https://img.shields.io/github/license/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole/blob/master/LICENSE)
-[![GitHub (pre-)release](https://img.shields.io/github/release/MCStreetguy/SmartConsole/all.svg)](https://github.com/MCStreetguy/SmartConsole)
-[![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
+<!-- [![GitHub (pre-)release](https://img.shields.io/github/release/MCStreetguy/SmartConsole/all.svg)](https://github.com/MCStreetguy/SmartConsole)
+[![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole) -->
 [![GitHub last commit](https://img.shields.io/github/last-commit/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
-[![GitHub top language](https://img.shields.io/github/languages/top/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
-[![GitHub contributors](https://img.shields.io/github/contributors/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
+<!-- [![GitHub top language](https://img.shields.io/github/languages/top/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole)
+[![GitHub contributors](https://img.shields.io/github/contributors/MCStreetguy/SmartConsole.svg)](https://github.com/MCStreetguy/SmartConsole) -->
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/MCStreetguy/SmartConsole.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FMCStreetguy%2FSmartConsole)
-[![Documentation Status](https://readthedocs.org/projects/smartconsole/badge/?version=latest)](https://smartconsole.readthedocs.io/en/latest/?badge=latest)
+<!-- [![Documentation Status](https://readthedocs.org/projects/smartconsole/badge/?version=latest)](https://smartconsole.readthedocs.io/en/latest/?badge=latest) -->
 
 Have you ever wondered why it is so complicated to write a console application in PHP?
 Whichever library you use, you'll end up with hundreds of lines of configuration before you can even read the first 'Hello World' in the terminal.
