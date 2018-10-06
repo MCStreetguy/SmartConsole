@@ -1,0 +1,14 @@
+build:
+  image: latest
+
+formats:
+  - htmlzip
+  - pdf
+  - epub
+
+requirements_file: '.require.pip'
+
+python:
+  setup_py_install: true
+  pip_install: true
+  
