@@ -19,6 +19,7 @@ use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use Webmozart\Console\Api\Config\ApplicationConfig;
 use DI\ContainerBuilder;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use MCStreetguy\SmartConsole\Annotations\ShortName;
 
 class Console extends DefaultApplicationConfig
 {
@@ -254,8 +255,17 @@ class Console extends DefaultApplicationConfig
                     $defaultValue = $parameter->getDefaultValue();
 
                     $optionName = StringHelper::camelToSnakeCase($name);
+                    $shortNameMap = array_filter($this->annotationReader->getMethodAnnotations($method), function ($elem) use ($optionName) {
+                        return ($elem instanceof ShortName) && ($elem->getOption() === $optionName);
+                    });
 
-                    $flags = Option::PREFER_LONG_NAME;
+                    if (!empty($shortNameMap)) {
+                        $shortName = $shortNameMap[0]->getShort();
+                        $flags = Option::PREFER_SHORT_NAME;
+                    } else {
+                        $shortName = null;
+                        $flags = Option::PREFER_LONG_NAME;
+                    }
 
                     if ($parameter->hasType()) {
                         $type = $parameter->getType();
@@ -299,7 +309,7 @@ class Console extends DefaultApplicationConfig
                         $flags = $flags | Option::MULTI_VALUED;
                     }
 
-                    $subCommand->addOption($optionName, null, $flags, $description, $defaultValue);
+                    $subCommand->addOption($optionName, $shortName, $flags, $description, $defaultValue);
                 } else {
                     $flags = Argument::REQUIRED;
 
