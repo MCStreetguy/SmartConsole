@@ -138,6 +138,11 @@ class HelloWorldCommand extends AbstractCommand
 We just created a command named 'hello-world' that prints out 'Hello World!' on execution.  
 _(Yeah, I know, not very inventive, but it's enough for a demonstration)_
 
+You have to follow some guidelines so that SmartConsole recognizes everything correctly.
+For example, the class name of a command handler must end in `Command` and all relevant methods must end in `Action`.
+Relevant in this context means methods that represent either the sole or different functions of the command.
+I'll explain the [exact procedure of the algorithm](#the-analysis-algorithm) later.
+
 Now we extend our app config to tell it about our new command:
 
 ``` php hl_lines="17 18 19"
@@ -167,7 +172,7 @@ class MyApplication extends Console
 
 Let's have a look at the help page again to check for the freshly created command:
 
-``` bash hl_lines="21"
+``` text hl_lines="21"
 $ ./bin/my-application help
 My Application version 0.0.0-alpha
 
@@ -193,7 +198,175 @@ AVAILABLE COMMANDS
 
 ```
 
+``` text
+$ ./bin/my-application help hello-world
+USAGE
+  my-application hello-world
+
+GLOBAL OPTIONS
+  -h (--help)            Display help about the command
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal output, "-vv" for more verbose output and "-vvv" for debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+```
+
 Wow, that was easy huh? Like this you define all your commands, their options, arguments and help-texts. Even very complex commands do not require any more configuration than you've already written.
+Speaking of which, let's implement a more complicated command right now.
+
+### A more complex command
+
+Whereas 'complex' means that our command should have several sub-commands available.
+Imagine this as with the Git CLI, where we sometimes have to type several command names one after the other.
+For example the `git remote` command has the sub-commands `add`, `remove`, `show` and so on.
+
+Let us take this example seriously and put it into practice.
+As you can imagine our command handler now looks a lot more complex.
+Every action method must now have a doc block and [annotations](https://www.doctrine-project.org/projects/doctrine-annotations/en/latest/index.html#introduction) have been added.
+Let's take a look at the code first and then at the help page to see what happens before I explain exactly what we do.
+
+``` php
+<?php
+namespace Vendor\MyCLI\Command;
+
+use MCStreetguy\SmartConsole\Annotations as CLI;
+use MCStreetguy\SmartConsole\Command\AbstractCommand;
+
+/**
+ * Manage set of tracked repositories.
+ */
+class RemoteCommand extends AbstractCommand
+{
+    /**
+     * Adds a remote named <name> for the repository at <url>.
+     *
+     * The command git fetch <name> can then be used to create and update remote-tracking branches <name>/<branch>.
+     *
+     * @param string $name The name of the remote to add.
+     * @param string $url The url of the remote to add.
+     * @param bool $fetch Run git fetch <name> immediately after the remote information is set up.
+     * @CLI\ShortName(option="fetch",short="f")
+     */
+    public function addAction(string $name, string $url, bool $fetch = false)
+    {
+        // some logic
+    }
+
+    /**
+     * Remove the remote named <name>.
+     *
+     * All remote-tracking branches and configuration settings for the remote are removed.
+     *
+     * @param string $name The name of the remote to remove.
+     */
+    public function removeAction(string $name)
+    {
+        // some logic
+    }
+
+    /**
+     * Gives some information about the remote <name>.
+     *
+     * @param string $name The name of the remote to display.
+     */
+    public function showAction(string $name)
+    {
+        // some logic
+    }
+
+    /**
+     * Show a list of existing remotes.
+     *
+     * @CLI\DefaultCommand
+     */
+    public function listAction()
+    {
+        // some logic
+    }
+}
+```
+
+``` text hl_lines="23"
+$ ./bin/my-application help
+My Application version 0.0.0-alpha
+
+USAGE
+  my-application [-h] [-q] [-v [<level>]] [-V] [--ansi] [--no-ansi] [-n] <command> [<arg1>] ... [<argN>]
+
+ARGUMENTS
+  <command>              The command to execute
+  <arg>                  The arguments of the command
+
+GLOBAL OPTIONS
+  -h (--help)            Display help about the command
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal output, "-vv" for more verbose output and "-vvv" for debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+AVAILABLE COMMANDS
+  hello-world            Print 'Hello World!' to the terminal.
+  help                   Display the manual of a command
+  remote                 Manage set of tracked repositories.
+
+```
+
+``` text
+$ ./bin/my-application help remote
+USAGE
+      my-application remote
+  or: my-application remote add [-f] <name> <url>
+  or: my-application remote remove <name>
+  or: my-application remote show <name>
+  or: my-application remote list
+
+COMMANDS
+  add
+    Adds a remote named <name> for the repository at <url>.
+    The command git fetch <name> can then be used to create and update remote-tracking branches <name>/<branch>.
+
+    <name>               The name of the remote to add.
+    <url>                The url of the remote to add.
+
+    -f (--fetch)         Run git fetch <name> immediately after the remote information is set up.
+
+  list
+    Show a list of existing remotes.
+
+  remove
+    Remove the remote named <name>.
+    All remote-tracking branches and configuration settings for the remote are removed.
+
+    <name>               The name of the remote to remove.
+
+  show
+    Gives some information about the remote <name>.
+
+    <name>               The name of the remote to display.
+
+GLOBAL OPTIONS
+  -h (--help)            Display help about the command
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal output, "-vv" for more verbose output and "-vvv" for debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+```
+
+As you can see, SmartConsole reads all of our doc-blocks and creates the respective sub-commands.
+The parameters of our methods are also analysed and turned into arguments for required ones and into options for optional params.
+In addition we define a short name for our `fetch` option as well as a default command, which means the sub-command beeing executed when no sub-command name is given.
+
+!!! tip "Developers Note"
+    This annotation is actually required for a complex command to work properly.
+    Leaving it out or specifying it twice or even more often leads to exceptions!
 
 ### The analysis algorithm
 
