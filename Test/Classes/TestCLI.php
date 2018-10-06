@@ -15,7 +15,8 @@ class TestCLI extends Console
             'version' => '0.0.0-alpha',
             'displayName' => 'My Application',
             'commands' => [
-                HelloWorldCommand::class
+                HelloWorldCommand::class,
+                RemoteCommand::class
             ]
         ]);
     }
