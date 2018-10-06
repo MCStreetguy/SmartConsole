@@ -25,7 +25,7 @@ class Args
         throw new \BadMethodCallException("Call to undefined method '$name' on '" . static::class . "'!", 1538601445);
     }
 
-    public function __callStatic($name, $arguments)
+    public static function __callStatic($name, $arguments)
     {
         if (method_exists([ArgsApi::class, $name])) {
             return call_user_func_array([ArgsApi::class, $name], $arguments);
