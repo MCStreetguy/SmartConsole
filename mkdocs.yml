@@ -34,7 +34,11 @@ markdown_extensions:
   - pymdownx.tilde
 
 pages:
-  - Introduction: index.md
-  - Usage Guide: usage.md
-  - Reference: references.md
-  - Examples: examples.md
+  - Documentation:
+    - Introduction: index.md
+    - Usage Guide: usage.md
+  - Reference:
+    - The analysis algorithm: references/algorithm.md
+    - Annotations: references/annotations.md
+  - Examples:
+    - Rudimentary Setup: examples/guide.md

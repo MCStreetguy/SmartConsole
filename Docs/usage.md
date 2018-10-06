@@ -367,10 +367,3 @@ In addition we define a short name for our `fetch` option as well as a default c
 !!! tip "Developers Note"
     This annotation is actually required for a complex command to work properly.
     Leaving it out or specifying it twice or even more often leads to exceptions!
-
-### The analysis algorithm
-
-Below you find a detailled explanation on how the analysis algorithm of SmartConsole works.
-This is to prevent configuration errors of your commands since any information is retrieved from the class directly.
-
-_(to be written)_
