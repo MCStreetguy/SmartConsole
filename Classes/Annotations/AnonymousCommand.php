@@ -9,6 +9,6 @@ namespace MCStreetguy\SmartConsole\Annotations;
  * @Annotation
  * @Target("METHOD")
  */
-final class AnonymousCommand
+class AnonymousCommand
 {
 }

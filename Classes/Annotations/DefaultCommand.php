@@ -8,6 +8,6 @@ namespace MCStreetguy\SmartConsole\Annotations;
  * @Annotation
  * @Target("METHOD")
  */
-final class DefaultCommand
+class DefaultCommand
 {
 }
