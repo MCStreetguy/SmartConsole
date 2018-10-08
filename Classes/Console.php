@@ -239,7 +239,6 @@ class Console extends DefaultApplicationConfig
             foreach ($params as $parameter) {
                 $name = $parameter->getName();
                 $description = null;
-                $optionShortName = null;
 
                 $paramTags = $methodDocBlock->getTagsByName('param');
                 $paramTags = array_values(array_filter($paramTags, function (Param $elem) use ($name) {
