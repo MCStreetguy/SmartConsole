@@ -44,15 +44,15 @@ class Console extends DefaultApplicationConfig
             $config = new static();
         }
 
+        if ($config->isDebug()) {
+            (new ConsoleApplication($config))->run();
+            exit;
+        }
+
         $config->setTerminateAfterRun(false);
         $config->setCatchExceptions(false);
 
         $code = 0;
-
-        $cli = new ConsoleApplication($config);
-        $result = $cli->run();
-        exit;
-
 
         try {
             $cli = new ConsoleApplication($config);
