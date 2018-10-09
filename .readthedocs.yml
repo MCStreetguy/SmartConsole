@@ -9,6 +9,6 @@ formats:
 requirements_file: '.require.pip'
 
 python:
-  setup_py_install: true
+  setup_py_install: false
   pip_install: true
   
