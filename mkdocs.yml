@@ -39,6 +39,8 @@ pages:
     - Usage Guide: usage.md
   - Reference:
     - The analysis algorithm: references/algorithm.md
+    - Configuration: references/configuration.md
     - Annotations: references/annotations.md
   - Examples:
+    - Overview: examples/overview.md
     - Rudimentary Setup: examples/guide.md

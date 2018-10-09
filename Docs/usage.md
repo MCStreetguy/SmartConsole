@@ -47,8 +47,12 @@ class MyApplication extends Console
 
 Just by looking at the code example, it should be clear what happens. The configure method is called automatically on instantiation, so this is normally the place where we define our settings.
 
-!!! info "Please note..."
+!!! info "Developers Note"
     Since there are also configure-methods in the parent classes of our CLI that are required for the application to work properly you need to ensure that `parent::configure()` is called before you start with your own config!
+
+!!! tip "Developers Note"
+    The `init` method is obviously not the only configuration method available on the class but it is recommended to use it with an config array as this ensures bugless execution as far as possible.
+    If you prefer to, you can also set the values directly but in this case you have to keep a closer eye on your code.
 
 To say a few more words about the above example:
 
