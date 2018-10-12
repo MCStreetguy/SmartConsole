@@ -1,6 +1,6 @@
 <?php
 
-namespace MCStreetguy\SmartConsole\Annotations;
+namespace MCStreetguy\SmartConsole\Annotations\Command;
 
 /**
  * Defines a short name for an option.

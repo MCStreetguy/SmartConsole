@@ -1,6 +1,6 @@
 <?php
 
-namespace MCStreetguy\SmartConsole\Annotations;
+namespace MCStreetguy\SmartConsole\Annotations\Command;
 
 /**
  * Marks the default subcommand as anonymous, preventing it from beeing called by it's name.
