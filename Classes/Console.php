@@ -21,6 +21,9 @@ use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
 use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
+use MCStreetguy\SmartConsole\Annotations\App\Version;
+use MCStreetguy\SmartConsole\Annotations\App\DisplayName;
+use MCStreetguy\SmartConsole\Annotations\App\DebugMode;
 
 class Console extends DefaultApplicationConfig
 {
@@ -103,6 +106,55 @@ class Console extends DefaultApplicationConfig
         $this->docBlockFactory = DocBlockFactory::createInstance();
 
         parent::__construct($name, $version);
+    }
+
+    /**
+     * Analyses the current inheriting class in order to recieve the configuration options automatically from code.
+     *
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function autoInit()
+    {
+        $config = [];
+        $reflector = new \ReflectionClass(static::class);
+
+        $className = $reflector->getName();
+        $config['name'] = $appName = StringHelper::camelToSnakeCase($className);
+
+        $classDocBlock = $reflector->getDocComment();
+        Assert::notEmpty($classDocBlock, "Cannot auto-init '$className' as it contains no valid doc-block to analyze!");
+        $classDocBlock = $this->docBlockFactory->create($classDocBlock);
+
+        /** @var Version|null $versionAnnotation */
+        $versionAnnotation = $this->annotationReader->getClassAnnotation($reflector, Version::class);
+        if ($versionAnnotation !== null) {
+            $config['version'] = $versionAnnotation->getVersion();
+        }
+
+        /** @var DisplayName|null $displayNameAnnotation */
+        $displayNameAnnotation = $this->annotationReader->getClassAnnotation($reflector, DisplayName::class);
+        if ($displayNameAnnotation !== null) {
+            $config['displayName'] = $displayNameAnnotation->getName();
+        }
+
+        $helpText = $classSummary = $classDocBlock->getSummary();
+        if (!empty($helpText)) {
+            $classDescription = $classDocBlock->getDescription();
+
+            if (!empty($classDescription)) {
+                $helpText .= PHP_EOL . PHP_EOL . $classDescription;
+            }
+
+            $config['helpText'] = HelpTextUtility::convertToHelpText($helpText);
+        }
+
+        $debugModeAnnotation = $this->annotationReader->getClassAnnotation($reflector, DebugMode::class);
+        if ($debugModeAnnotation !== null) {
+            $config['debugMode'] = true;
+        }
+
+        return $this->init($config);
     }
 
     /**
