@@ -176,17 +176,15 @@ class Console extends DefaultApplicationConfig
 
         $classDocBlock = $this->docBlockFactory->create($classDocBlock);
 
-        $summary = $description = $classDocBlock->getSummary();
+        $summary = $classDocBlock->getSummary();
 
         Assert::notEmpty($summary, "The command handler doc-block of '$class' is missing a summary!");
 
         $command->setDescription($summary);
 
-        if (!empty($docDesc = (string)$classDocBlock->getDescription())) {
-            $description .= PHP_EOL . $docDesc;
+        if (!empty($description = (string)$classDocBlock->getDescription())) {
+            $command->setHelp($description);
         }
-
-        $command->setHelp($description);
 
         $container = &$this->container;
         $command->setHandler(function () use ($class, $container) {
@@ -229,15 +227,15 @@ class Console extends DefaultApplicationConfig
 
                 $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
 
-                $commandSummary = $commandDescription = $methodDocBlock->getSummary();
+                $commandSummary = $methodDocBlock->getSummary();
+
+                Assert::notEmpty($commandSummary, "The action method doc-block for '$cmdName' in '$class' is missing a summary!");
 
                 $subCommand->setDescription($commandSummary);
 
-                if (!empty($cmdDesc = (string) $methodDocBlock->getDescription())) {
-                    $commandDescription .= PHP_EOL . $cmdDesc;
+                if (!empty($commandDescription = (string) $methodDocBlock->getDescription())) {
+                    $subCommand->setHelp($commandDescription);
                 }
-
-                $subCommand->setHelp($commandDescription);
             }
 
             $params = $method->getParameters();
