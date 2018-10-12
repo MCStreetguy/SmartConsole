@@ -25,6 +25,7 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
+use MCStreetguy\SmartConsole\Exceptions\ErrorException;
 
 class Console extends DefaultApplicationConfig
 {
@@ -54,40 +55,46 @@ class Console extends DefaultApplicationConfig
             $config = new static();
         }
 
-        if ($config->isDebug()) {
-            (new ConsoleApplication($config))->run();
-            exit;
+        if (!$config->isDebug()) {
+            $config->setCatchExceptions(false);
+
+            self::registerHandlers();
         }
 
         $config->setTerminateAfterRun(false);
-        $config->setCatchExceptions(false);
 
         $code = 0;
 
-        try {
-            $cli = new ConsoleApplication($config);
-            $result = $cli->run();
+        $cli = new ConsoleApplication($config);
+        $result = $cli->run();
 
-            if (!empty($result) && is_int($result)) {
-                $code = $result;
-            }
-        } catch (\Exception $e) {
+        if (!empty($result) && is_int($result)) {
+            $code = $result;
+        }
+
+        if (is_int($code) && $code > 255) {
+            $code = 255;
+        }
+
+        exit($code);
+    }
+
+    public static function registerHandlers()
+    {
+        $io = new RawIO;
+
+        $handler = function (\Exception $e) use ($io) {
             $message = $e->getMessage();
             $code = $e->getCode();
 
-            $rawIO = new RawIO;
-            $rawIO->emergency("Fatal: $message (Code: $code)");
+            $io->emergency("Fatal: $message (Code: $code)");
+        };
 
-            if (empty($code) || !is_int($code)) {
-                $code = 1;
-            }
-        } finally {
-            if (is_int($code) && $code > 255) {
-                $code = 255;
-            }
+        set_exception_handler($handler);
 
-            exit($code);
-        }
+        set_error_handler(function ($code, $msg) use ($handler) {
+            $handler(new ErrorException($msg, $code));
+        });
     }
 
     public function execute()
