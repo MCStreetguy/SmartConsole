@@ -94,7 +94,9 @@ class Console extends DefaultApplicationConfig
 
         set_error_handler(function ($code, $msg) use ($handler) {
             $handler(new ErrorException($msg, $code));
-        });
+        }, error_reporting());
+
+        error_reporting(~E_ALL);
     }
 
     public function execute()
