@@ -119,7 +119,7 @@ class Console extends DefaultApplicationConfig
         $config = [];
         $reflector = new \ReflectionClass(static::class);
 
-        $className = $reflector->getName();
+        $className = $reflector->getShortName();
         $config['name'] = $appName = StringHelper::camelToSnakeCase($className);
 
         $classDocBlock = $reflector->getDocComment();
