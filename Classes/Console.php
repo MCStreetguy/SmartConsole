@@ -278,6 +278,10 @@ class Console extends DefaultApplicationConfig
         foreach ($actionMethods as $method) {
             $cmdName = str_replace('Action', '', $method->getName());
 
+            $methodDocBlock = $method->getDocComment();
+            Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
+            $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
+
             $subCommand = $command->beginSubCommand(StringHelper::camelToSnakeCase($cmdName));
             $subCommand->setHandlerMethod("${cmdName}Cmd");
 
@@ -292,12 +296,6 @@ class Console extends DefaultApplicationConfig
                         $subCommand->markAnonymous();
                     }
                 }
-
-                $methodDocBlock = $method->getDocComment();
-
-                Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
-
-                $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
 
                 $commandSummary = $methodDocBlock->getSummary();
 
