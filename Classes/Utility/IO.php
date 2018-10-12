@@ -125,7 +125,7 @@ class IO extends RawIO
 
     public function confirm(string $question) : bool
     {
-        $confirmation = $this->climate->confirm($question);
+        $confirmation = $this->climate->yellow()->confirm($question);
         return $confirmation->confirmed();
     }
 
