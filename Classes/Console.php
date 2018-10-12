@@ -5,14 +5,19 @@ namespace MCStreetguy\SmartConsole;
 use DI\ContainerBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use MCStreetguy\SmartConsole\Annotations as CLI;
+use MCStreetguy\SmartConsole\Annotations\App\DebugMode;
+use MCStreetguy\SmartConsole\Annotations\App\DisplayName;
+use MCStreetguy\SmartConsole\Annotations\App\Version;
+use MCStreetguy\SmartConsole\Annotations\Command\AnonymousCommand;
+use MCStreetguy\SmartConsole\Annotations\Command\DefaultCommand;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
+use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
 use MCStreetguy\SmartConsole\Utility\RawIO;
-use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use phpDocumentor\Reflection\DocBlockFactory;
 use Webmozart\Assert\Assert;
 use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
@@ -20,10 +25,6 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
-use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
-use MCStreetguy\SmartConsole\Annotations\App\Version;
-use MCStreetguy\SmartConsole\Annotations\App\DisplayName;
-use MCStreetguy\SmartConsole\Annotations\App\DebugMode;
 
 class Console extends DefaultApplicationConfig
 {
@@ -267,10 +268,10 @@ class Console extends DefaultApplicationConfig
                 $subCommand->markDefault();
                 $subCommand->markAnonymous();
             } else {
-                if ($this->annotationReader->getMethodAnnotation($method, CLI\DefaultCommand::class) !== null) {
+                if ($this->annotationReader->getMethodAnnotation($method, DefaultCommand::class) !== null) {
                     $subCommand->markDefault();
 
-                    if ($this->annotationReader->getMethodAnnotation($method, CLI\AnonymousCommand::class) !== null) {
+                    if ($this->annotationReader->getMethodAnnotation($method, AnonymousCommand::class) !== null) {
                         $subCommand->markAnonymous();
                     }
                 }
