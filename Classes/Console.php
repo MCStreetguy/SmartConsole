@@ -114,7 +114,7 @@ class Console extends DefaultApplicationConfig
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function autoInit()
+    public function init()
     {
         $config = [];
         $reflector = new \ReflectionClass(static::class);
@@ -154,7 +154,7 @@ class Console extends DefaultApplicationConfig
             $config['debugMode'] = true;
         }
 
-        return $this->init($config);
+        return $this->initFromConfig($config);
     }
 
     /**
@@ -164,7 +164,7 @@ class Console extends DefaultApplicationConfig
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function init(array $config)
+    public function initFromConfig(array $config)
     {
         Assert::keyExists($config, 'name', 'The console application requires a name!');
         Assert::string($config['name'], 'Expected a string as application name, got %s!');
