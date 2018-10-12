@@ -2,24 +2,25 @@
 
 namespace MCStreetguy\SmartConsole;
 
+use DI\ContainerBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use MCStreetguy\SmartConsole\Annotations as CLI;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
+use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use MCStreetguy\SmartConsole\Utility\RawIO;
+use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
-use phpDocumentor\Reflection\DocBlockFactory;
 use Webmozart\Assert\Assert;
 use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
+use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
-use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
-use Webmozart\Console\Api\Config\ApplicationConfig;
-use DI\ContainerBuilder;
-use Doctrine\Common\Annotations\AnnotationRegistry;
-use MCStreetguy\SmartConsole\Annotations\ShortName;
+use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
 
 class Console extends DefaultApplicationConfig
 {
@@ -93,7 +94,7 @@ class Console extends DefaultApplicationConfig
         $factory = new ContainerBuilder();
         $factory->useAnnotations(true);
         $factory->useAutowiring(true);
-        
+
         $this->container = $factory->build();
 
         AnnotationRegistry::registerLoader('class_exists');
@@ -162,7 +163,7 @@ class Console extends DefaultApplicationConfig
         $reflector = new \ReflectionClass($class);
 
         $className = $reflector->getShortName();
-        
+
         Assert::endsWith($className, 'Command', "The command handler class '$class' has an invalid name: '%s'!");
 
         $commandName = str_replace('Command', '', $className);
@@ -182,7 +183,8 @@ class Console extends DefaultApplicationConfig
 
         $command->setDescription($summary);
 
-        if (!empty($description = (string)$classDocBlock->getDescription())) {
+        if (!empty($description = (string) $classDocBlock->getDescription())) {
+            $description = HelpTextUtility::convertToHelpText($description);
             $command->setHelp($description);
         }
 
@@ -222,7 +224,7 @@ class Console extends DefaultApplicationConfig
                 }
 
                 $methodDocBlock = $method->getDocComment();
-                
+
                 Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
 
                 $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
@@ -234,6 +236,7 @@ class Console extends DefaultApplicationConfig
                 $subCommand->setDescription($commandSummary);
 
                 if (!empty($commandDescription = (string) $methodDocBlock->getDescription())) {
+                    $commandDescription = HelpTextUtility::convertToHelpText($commandDescription);
                     $subCommand->setHelp($commandDescription);
                 }
             }

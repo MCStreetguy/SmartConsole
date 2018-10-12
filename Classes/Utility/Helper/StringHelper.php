@@ -2,7 +2,7 @@
 
 namespace MCStreetguy\SmartConsole\Utility\Helper;
 
-class StringHelper
+abstract class StringHelper
 {
     public static function camelToSnakeCase(string $input) : string
     {
