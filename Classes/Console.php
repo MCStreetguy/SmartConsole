@@ -163,7 +163,7 @@ class Console extends DefaultApplicationConfig
 
         $className = $reflector->getShortName();
         
-        Assert::endsWith($className, 'Command', "The command handler class '$class' has an invalid name!");
+        Assert::endsWith($className, 'Command', "The command handler class '$class' has an invalid name: '%s'!");
 
         $commandName = str_replace('Command', '', $className);
         $commandName = StringHelper::camelToSnakeCase($commandName);
@@ -176,13 +176,17 @@ class Console extends DefaultApplicationConfig
 
         $classDocBlock = $this->docBlockFactory->create($classDocBlock);
 
-        $description = $classDocBlock->getSummary();
+        $summary = $description = $classDocBlock->getSummary();
 
-        if (!empty($docDesc = (string) $classDocBlock->getDescription())) {
+        Assert::notEmpty($summary, "The command handler doc-block of '$class' is missing a summary!");
+
+        $command->setDescription($summary);
+
+        if (!empty($docDesc = (string)$classDocBlock->getDescription())) {
             $description .= PHP_EOL . $docDesc;
         }
 
-        $command->setDescription($description);
+        $command->setHelp($description);
 
         $container = &$this->container;
         $command->setHandler(function () use ($class, $container) {
@@ -225,13 +229,15 @@ class Console extends DefaultApplicationConfig
 
                 $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
 
-                $commandDescription = $methodDocBlock->getSummary();
+                $commandSummary = $commandDescription = $methodDocBlock->getSummary();
+
+                $subCommand->setDescription($commandSummary);
 
                 if (!empty($cmdDesc = (string) $methodDocBlock->getDescription())) {
                     $commandDescription .= PHP_EOL . $cmdDesc;
                 }
 
-                $subCommand->setDescription($commandDescription);
+                $subCommand->setHelp($commandDescription);
             }
 
             $params = $method->getParameters();
