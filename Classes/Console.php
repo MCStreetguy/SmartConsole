@@ -43,6 +43,11 @@ class Console extends DefaultApplicationConfig
      */
     protected $docBlockFactory;
 
+    /**
+     * @var array
+     */
+    protected static $factoryDefinitions = [];
+
     public static function run(ApplicationConfig $config = null)
     {
         if ($config === null) {
@@ -95,17 +100,29 @@ class Console extends DefaultApplicationConfig
      */
     public function __construct($name = null, $version = null)
     {
+        # Dependency Container
         $factory = new ContainerBuilder();
         $factory->useAnnotations(true);
         $factory->useAutowiring(true);
 
-        $this->container = $factory->build();
+        $container = $factory->build();
 
+        if (is_array(static::$factoryDefinitions) && !empty(static::$factoryDefinitions)) {
+            foreach (static::$factoryDefinitions as $target => $definition) {
+                $container->set($target, $definition);
+            }
+        }
+
+        $this->container = $container;
+
+        # Annotation Reader
         AnnotationRegistry::registerLoader('class_exists');
         $this->annotationReader = new AnnotationReader();
 
+        # DocBlockParser
         $this->docBlockFactory = DocBlockFactory::createInstance();
 
+        # Further init
         parent::__construct($name, $version);
     }
 
