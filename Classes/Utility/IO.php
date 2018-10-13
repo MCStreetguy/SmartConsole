@@ -88,7 +88,7 @@ class IO extends RawIO
 
     // Input
 
-    public function prompt(string $question, string $default = null, bool $multiline = false, bool $hidden = false)
+    public function prompt(string $question, bool $forceAnswer = false, string $default = null, bool $multiline = false, bool $hidden = false)
     {
         if ($hidden) {
             $input = $this->climate->password($question);
@@ -104,7 +104,15 @@ class IO extends RawIO
             $input->multiline();
         }
 
-        return $input->prompt();
+        $result = $input->prompt();
+
+        if ($forceAnswer) {
+            while (empty($result)) {
+                $result = $input->prompt();
+            }
+        }
+
+        return $result;
     }
 
     public function choose(string $question, array $answers, string $default = null, bool $hint = false, bool $strict = false)
