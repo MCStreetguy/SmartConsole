@@ -283,7 +283,7 @@ class Console extends DefaultApplicationConfig
         Assert::notEmpty($actionMethods, "The command handler class '$class' defines no valid action methods!");
 
         if (count($actionMethods) === 1) {
-            $method = $actionMethods[0];
+            $method = array_shift($actionMethods);
             $cmdName = str_replace('Action', '', $method->getName());
 
             $command->setHandlerMethod("${cmdName}Cmd");
