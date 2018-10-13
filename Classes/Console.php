@@ -97,6 +97,8 @@ class Console extends DefaultApplicationConfig
         }, error_reporting());
 
         error_reporting(~E_ALL);
+        ini_set('display_errors', 0);
+        ini_set('display_startup_errors', 1);
     }
 
     public function execute()
