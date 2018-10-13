@@ -88,12 +88,21 @@ class IO extends RawIO
 
     // Input
 
-    public function prompt(string $question, bool $forceAnswer = false, string $default = null, bool $multiline = false, bool $hidden = false)
-    {
+    public function prompt(
+        string $question,
+        bool $forceAnswer = false,
+        string $default = null,
+        bool $multiline = false,
+        bool $hidden = false,
+        string $color = null,
+        string $background = null
+    ) {
+        $climate = $this->climate($color, $background);
+
         if ($hidden) {
-            $input = $this->climate->password($question);
+            $input = $climate->password($question);
         } else {
-            $input = $this->climate->input($question);
+            $input = $climate->input($question);
         }
 
         if ($default !== null) {
@@ -115,9 +124,16 @@ class IO extends RawIO
         return $result;
     }
 
-    public function choose(string $question, array $answers, string $default = null, bool $hint = false, bool $strict = false)
-    {
-        $input = $this->climate->input($question);
+    public function choose(
+        string $question,
+        array $answers,
+        string $default = null,
+        bool $hint = false,
+        bool $strict = false,
+        string $color = null,
+        string $background = null
+    ) {
+        $input = $this->climate($color, $background)->input($question);
         $input->accept($answers, $hint);
 
         if ($default !== null) {
@@ -131,9 +147,9 @@ class IO extends RawIO
         return $input->prompt();
     }
 
-    public function confirm(string $question): bool
+    public function confirm(string $question, string $color = 'yellow', string $background = null): bool
     {
-        $confirmation = $this->climate->yellow()->confirm($question);
+        $confirmation = $this->climate($color, $background)->confirm($question);
         return $confirmation->confirmed();
     }
 
@@ -185,17 +201,24 @@ class IO extends RawIO
         $table->render($this->io);
     }
 
-    public function columns(array $data, int $count = null)
+    public function columns(array $data, int $count = null, string $color = null, string $background = null)
     {
+        $climate = $this->climate($color, $background);
+
         if ($count !== null) {
-            $this->climate->columns($data, $count);
+            $climate->columns($data, $count);
         } else {
-            $this->climate->columns($data);
+            $climate->columns($data);
         }
     }
 
-    public function padding(array $data, int $size = null, string $character = null)
-    {
+    public function padding(
+        array $data,
+        int $size = null,
+        string $character = null,
+        string $color = null,
+        string $background = null
+    ) {
         if ($size === null) {
             $longestKey = 0;
 
@@ -208,7 +231,7 @@ class IO extends RawIO
             $size = $longestKey + 5;
         }
 
-        $padding = $this->climate->padding($size);
+        $padding = $this->climate($color, $background)->padding($size);
 
         if ($character !== null) {
             $character = substr($character, 0, 1);
@@ -220,19 +243,19 @@ class IO extends RawIO
         }
     }
 
-    public function border(string $pattern = null, int $size = null)
+    public function border(string $pattern = null, int $size = null, string $color = null, string $background = null)
     {
-        $this->climate->border($pattern, $size);
+        $this->climate($color, $background)->border($pattern, $size);
     }
 
     // Progress
 
-    public function startProgressBar(int $total = 100)
+    public function startProgressBar(int $total = 100, string $color = null, string $background = null)
     {
         Assert::null($this->currentProgress, 'You cannot start multiple progress bars at once!');
 
         $this->currentProgressTotal = $total;
-        $this->currentProgress = $this->climate->progress($total);
+        $this->currentProgress = $this->climate($color, $background)->progress($total);
     }
 
     public function setProgress(int $progress, string $label = null)
@@ -255,5 +278,59 @@ class IO extends RawIO
 
         $this->currentProgress = null;
         $this->currentProgressTotal = null;
+    }
+
+    // Helper methods
+
+    protected function climate(string $color = null, string $background = null): CLImate
+    {
+        $climate = $this->climate;
+
+        if (!empty($color)) {
+            self::validateColor($color);
+
+            $climate = $climate->$color();
+        }
+
+        if (!empty($background)) {
+            self::validateBackgroundColor($background);
+
+            $climate = $climate->$background();
+        }
+
+        return $climate;
+    }
+
+    protected static function validateColor(string $color)
+    {
+        Assert::oneOf($color, [
+            'black',
+            'red',
+            'green',
+            'yellow',
+            'blue',
+            'magenta',
+            'cyan',
+            'lightGray',
+            'darkGray',
+            'lightRed',
+            'lightGreen',
+            'lightYellow',
+            'lightBlue',
+            'lightMagenta',
+            'lightCyan',
+            'white',
+        ], "Invalid color: '%s'!");
+    }
+
+    protected static function validateBackgroundColor(string $backgroundColor)
+    {
+        Assert::startsWith($backgroundColor, 'background', "Invalid background color: '%s'!");
+
+        $color = preg_replace_callback('/background(.)/', function ($matches) {
+            return strtolower($matches[1]);
+        }, $backgroundColor);
+
+        static::validateColor($color);
     }
 }
