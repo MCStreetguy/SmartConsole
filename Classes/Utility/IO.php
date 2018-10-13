@@ -143,6 +143,19 @@ class IO extends RawIO
 
     // Special Formatting
 
+    public function list(array $data, bool $borderless = true)
+    {
+        if ($borderless) {
+            $list = new Table(TableStyle::borderless());
+        } else {
+            $list = new Table(TableStyle::solidBorder());
+        }
+
+        $list->setRows($data);
+
+        $list->render($this->io);
+    }
+
     public function table(array $data, bool $borderless = false)
     {
         Assert::allIsArray($data);
