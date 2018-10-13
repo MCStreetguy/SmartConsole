@@ -41,6 +41,8 @@ pages:
     - The analysis algorithm: references/algorithm.md
     - Configuration: references/configuration.md
     - Annotations: references/annotations.md
+    - IO Component: references/output.md
+    - Global Options: references/options.md
   - Examples:
     - Overview: examples/overview.md
     - Rudimentary Setup: examples/guide.md

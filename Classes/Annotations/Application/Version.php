@@ -1,6 +1,6 @@
 <?php
 
-namespace MCStreetguy\SmartConsole\Annotations\App;
+namespace MCStreetguy\SmartConsole\Annotations\Application;
 
 /**
  * Defines the application version.
