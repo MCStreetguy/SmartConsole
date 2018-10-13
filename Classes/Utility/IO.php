@@ -157,6 +157,8 @@ class IO extends RawIO
      * @param bool $hidden Make the user input hidden (i.e. for a password prompt)
      * @param string $color The foreground color to use
      * @param string $background The background color to use
+     * @param string $hintColor The foreground color to use for the hint, if shown
+     * @param string $hintBackground The background color to use for the hint, if shown
      * @return string
      * @throws \InvalidArgumentException
      */
@@ -167,18 +169,21 @@ class IO extends RawIO
         bool $hint = false,
         bool $multiline = false,
         bool $hidden = false,
-        string $color = null,
-        string $background = null
+        string $color = 'yellow',
+        string $background = null,
+        string $hintColor = 'cyan',
+        string $hintBackground = null
     ) {
         $climate = $this->climate($color, $background);
 
         if ($hidden) {
             $input = $climate->password($question);
-        } else {
-            if (!empty($default) && $hint) {
-                $question .= ' [' . $default . '] ';
-            }
+        } elseif (!empty($default) && $hint) {
+            $climate->inline($question);
+            $this->climate($hintColor, $hintBackground)->inline(" ['$default']");
 
+            $input = $climate->input('');
+        } else {
             $input = $climate->input($question);
         }
 
@@ -220,7 +225,7 @@ class IO extends RawIO
         string $default = null,
         bool $hint = false,
         bool $strict = false,
-        string $color = null,
+        string $color = 'yellow',
         string $background = null
     ) {
         $input = $this->climate($color, $background)->input($question);
