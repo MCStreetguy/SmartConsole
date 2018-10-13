@@ -367,6 +367,8 @@ class IO extends RawIO
      * @param string $character The character symbol to use as spacing
      * @param string $color The foreground color to use
      * @param string $background The background color to use
+     * @param string $resultColor The foreground color to use for the result column
+     * @param string $resultBackground The background color to use for the result column
      * @return void
      * @throws \InvalidArgumentException
      */
@@ -375,7 +377,9 @@ class IO extends RawIO
         int $size = null,
         string $character = null,
         string $color = null,
-        string $background = null
+        string $background = null,
+        string $resultColor = null,
+        string $resultBackground = null
     ) {
         if ($size === null) {
             $longestKey = 0;
@@ -389,15 +393,33 @@ class IO extends RawIO
             $size = $longestKey + 5;
         }
 
-        $padding = $this->climate($color, $background)->padding($size);
-
-        if ($character !== null) {
+        if (!empty($character)) {
             $character = substr($character, 0, 1);
-            $padding->char($character);
         }
 
-        foreach ($data as $key => $value) {
-            $padding->label($key)->result($value);
+        if (!empty($resultColor) || !empty($resultBackground)) {
+            $padLeft = $this->climate($color, $background)->padding($size);
+            $padRight = $this->climate($resultColor, $resultBackground)->padding($size);
+
+            if (!empty($character)) {
+                $padLeft->char($character);
+                $padRight->char($character);
+            }
+
+            foreach ($data as $key => $value) {
+                $padLeft->label($key);
+                $padRight->result($value);
+            }
+        } else {
+            $padding = $this->climate($color, $background)->padding($size);
+
+            if (!empty($character)) {
+                $padding->char($character);
+            }
+
+            foreach ($data as $key => $value) {
+                $padding->label($key)->result($value);
+            }
         }
     }
 
