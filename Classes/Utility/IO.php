@@ -2,13 +2,13 @@
 
 namespace MCStreetguy\SmartConsole\Utility;
 
-use Webmozart\Console\Api\IO\IO as IOApi;
 use League\CLImate\CLImate;
+use League\CLImate\TerminalObject\Dynamic\Progress;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
+use Webmozart\Console\Api\IO\IO as IOApi;
 use Webmozart\Console\UI\Component\Table;
 use Webmozart\Console\UI\Style\TableStyle;
-use League\CLImate\TerminalObject\Dynamic\Progress;
 
 class IO extends RawIO
 {
@@ -41,7 +41,7 @@ class IO extends RawIO
         $this->io->setInteractive($interactive);
     }
 
-    public function isInteractive() : bool
+    public function isInteractive(): bool
     {
         return $this->io->isInteractive();
     }
@@ -51,27 +51,27 @@ class IO extends RawIO
         $this->io->setVerbosity($verbosity);
     }
 
-    public function getVerbosity() : int
+    public function getVerbosity(): int
     {
         return $this->io->getVerbosity();
     }
 
-    public function isVerbose() : bool
+    public function isVerbose(): bool
     {
         return $this->io->isVerbose();
     }
 
-    public function isVeryVerbose() : bool
+    public function isVeryVerbose(): bool
     {
         return $this->io->isVeryVerbose();
     }
 
-    public function isDebug() : bool
+    public function isDebug(): bool
     {
         return $this->io->isDebug();
     }
 
-    public function isNormal() : bool
+    public function isNormal(): bool
     {
         return $this->getVerbosity() === 0;
     }
@@ -81,7 +81,7 @@ class IO extends RawIO
         $this->io->setQuiet($quiet);
     }
 
-    public function isQuiet() : bool
+    public function isQuiet(): bool
     {
         return $this->io->isQuiet();
     }
@@ -123,7 +123,7 @@ class IO extends RawIO
         return $input->prompt();
     }
 
-    public function confirm(string $question) : bool
+    public function confirm(string $question): bool
     {
         $confirmation = $this->climate->yellow()->confirm($question);
         return $confirmation->confirmed();
@@ -143,7 +143,7 @@ class IO extends RawIO
 
     // Special Formatting
 
-    public function list(array $data, bool $borderless = true)
+    public function simpleTable(array $data, bool $borderless = false)
     {
         if ($borderless) {
             $list = new Table(TableStyle::borderless());
@@ -151,7 +151,9 @@ class IO extends RawIO
             $list = new Table(TableStyle::solidBorder());
         }
 
-        $list->setRows($data);
+        foreach ($data as $key => $value) {
+            $list->addRow([$key, $value]);
+        }
 
         $list->render($this->io);
     }
