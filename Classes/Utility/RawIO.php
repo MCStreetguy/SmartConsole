@@ -4,6 +4,7 @@ namespace MCStreetguy\SmartConsole\Utility;
 
 use League\CLImate\CLImate;
 use Psr\Log\LoggerInterface;
+use Webmozart\Assert\Assert;
 
 class RawIO implements LoggerInterface
 {
@@ -12,6 +13,9 @@ class RawIO implements LoggerInterface
      */
     protected $climate;
 
+    /**
+     * Constructs a new instance
+     */
     public function __construct()
     {
         $this->climate = new CLImate;
@@ -60,7 +64,7 @@ class RawIO implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        $this->climate->red()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'red');
     }
 
     /**
@@ -74,7 +78,7 @@ class RawIO implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        $this->climate->red()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'red');
     }
 
     /**
@@ -90,7 +94,7 @@ class RawIO implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        $this->climate->yellow()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'yellow');
     }
 
     /**
@@ -103,7 +107,7 @@ class RawIO implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        $this->climate->cyan()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'cyan');
     }
 
     /**
@@ -118,7 +122,7 @@ class RawIO implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        $this->climate->cyan()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'cyan');
     }
 
     /**
@@ -145,7 +149,7 @@ class RawIO implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        $this->climate->out($this->interpolate($message, $context));
+        $this->out($message, $context);
     }
 
     /**
@@ -171,23 +175,133 @@ class RawIO implements LoggerInterface
 
     // Output
 
-    public function out(string $message, array $context = [])
+    /**
+     * Output a message to the terminal.
+     *
+     * @param string $message The message to print
+     * @param array|null $context Additional context variables that shall be interpolated into $message
+     * @param string|null $color The foreground color of the message
+     * @param string|null $background The background color of the message
+     * @return void
+     */
+    public function out(string $message, array $context = [], string $color = null, string $background = null)
     {
-        $this->climate->out($this->interpolate($message, $context));
+        $this->climate($color, $background)->out(
+            $this->interpolate($message, $context)
+        );
     }
 
+    /**
+     * Print a success-message to the terminal.
+     *
+     * @param string $message The message to print
+     * @param array|null $context Additional context variables that shall be interpolated into $message
+     * @return void
+     */
     public function success(string $message, array $context = [])
     {
-        $this->climate->green()->out($this->interpolate($message, $context));
+        $this->out($message, $context, 'green');
     }
 
-    public function newline()
+    /**
+     * Print a linebreak to the terminal.
+     *
+     * @param int $count Optionally the amount of linebreaks that shall be printed. (Must be a value above 0)
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function newline(int $count = 1)
     {
-        $this->climate->br();
+        Assert::greaterThan($count, 0, "Invalid linebreak count given, expected '>0' recieved '%s'!");
+
+        for ($i=0; $i < $count; $i++) {
+            $this->climate->br();
+        }
     }
 
+    /**
+     * Clear the terminal screen.
+     *
+     * @return void
+     */
     public function clear()
     {
         $this->climate->clear();
+    }
+
+    // Helper methods
+
+    /**
+     * Prepare the CLImate instance with fore- and background colors.
+     *
+     * @param string|null $color The foreground color to set
+     * @param string|null $background The background color to set
+     * @return CLImate
+     * @throws \InvalidArgumentException
+     */
+    protected function climate(string $color = null, string $background = null) : CLImate
+    {
+        $climate = $this->climate;
+
+        if (!empty($color)) {
+            self::validateColor($color);
+
+            $climate = $climate->$color();
+        }
+
+        if (!empty($background)) {
+            self::validateBackgroundColor($background);
+
+            $climate = $climate->$background();
+        }
+
+        return $climate;
+    }
+
+    /**
+     * Validates a foreground color string.
+     *
+     * @param string $color The color to validate
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    protected static function validateColor(string $color)
+    {
+        Assert::oneOf($color, [
+            'black',
+            'red',
+            'green',
+            'yellow',
+            'blue',
+            'magenta',
+            'cyan',
+            'lightGray',
+            'darkGray',
+            'lightRed',
+            'lightGreen',
+            'lightYellow',
+            'lightBlue',
+            'lightMagenta',
+            'lightCyan',
+            'white',
+        ], "Invalid color: '%s'!");
+    }
+
+    /**
+     * Validates a background color string.
+     *
+     * @param string $color The color to validate
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    protected static function validateBackgroundColor(string $backgroundColor)
+    {
+        Assert::startsWith($backgroundColor, 'background', "Invalid background color: '%s'!");
+
+        $color = preg_replace_callback('/background(.)/', function ($matches) {
+            return strtolower($matches[1]);
+        }, $backgroundColor);
+
+        static::validateColor($color);
     }
 }
