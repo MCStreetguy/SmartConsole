@@ -152,6 +152,7 @@ class IO extends RawIO
      * @param string $question The message to display to the user before prompting
      * @param bool $forceAnswer Force the user to input something, if the result is empty prompt again
      * @param string $default The default value of the prompt if the user omits entering anything
+     * @param bool $hint Give the user a hint about the default value
      * @param bool $multiline Make the input span over multiple lines and wait for ^D before returning
      * @param bool $hidden Make the user input hidden (i.e. for a password prompt)
      * @param string $color The foreground color to use
@@ -163,6 +164,7 @@ class IO extends RawIO
         string $question,
         bool $forceAnswer = false,
         string $default = null,
+        bool $hint = false,
         bool $multiline = false,
         bool $hidden = false,
         string $color = null,
@@ -173,6 +175,10 @@ class IO extends RawIO
         if ($hidden) {
             $input = $climate->password($question);
         } else {
+            if (!empty($default) && $hint) {
+                $question .= ' [' . $default . '] ';
+            }
+
             $input = $climate->input($question);
         }
 
