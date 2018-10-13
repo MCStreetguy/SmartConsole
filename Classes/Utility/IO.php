@@ -107,10 +107,10 @@ class IO extends RawIO
         return $input->prompt();
     }
 
-    public function choose(string $question, array $answers, string $default = null, bool $strict = false)
+    public function choose(string $question, array $answers, string $default = null, bool $hint = false, bool $strict = false)
     {
         $input = $this->climate->input($question);
-        $input->accept($answers);
+        $input->accept($answers, $hint);
 
         if ($default !== null) {
             $input->defaultTo($default);
