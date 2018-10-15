@@ -2,6 +2,6 @@
 
 namespace MCStreetguy\SmartConsole\Exceptions;
 
-class ErrorException extends \Exception
+class ErrorException extends BaseException
 {
 }

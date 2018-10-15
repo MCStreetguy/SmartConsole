@@ -28,28 +28,20 @@ use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
 use DI\Container;
+use MCStreetguy\SmartConsole\Utility\Analyzer;
+use MCStreetguy\SmartConsole\Exceptions\UnsupportedFeatureException;
 
 class Console extends DefaultApplicationConfig
 {
     /**
-     * @var AnnotationReader
-     */
-    protected $annotationReader;
-
-    /**
-     * @var DocBlockFactory
-     */
-    protected $docBlockFactory;
-
-    /**
-     * @var array
-     */
-    protected static $factoryDefinitions = [];
-
-    /**
      * @var Container
      */
     protected static $container;
+
+    /**
+     * @var Analyzer
+     */
+    protected $analyzer;
 
     public static function run(ApplicationConfig $config = null)
     {
@@ -95,7 +87,9 @@ class Console extends DefaultApplicationConfig
         set_exception_handler($handler);
 
         set_error_handler(function ($code, $msg) use ($handler) {
-            $handler(new ErrorException($msg, $code));
+            $converted = ErrorException::create($msg, $code);
+            
+            call_user_func($handler, $converted);
         }, error_reporting());
 
         error_reporting(~E_ALL);
@@ -109,28 +103,34 @@ class Console extends DefaultApplicationConfig
      */
     public static function getContainer() : Container
     {
+        // Return the container immediately if it has already been built
         if (!empty(static::$container)) {
             return static::$container;
         }
 
         $factory = new ContainerBuilder();
+
+        // Enable annotation injection and autowiring on the container
         $factory->useAnnotations(true);
         $factory->useAutowiring(true);
 
-        $container = $factory->build();
-
-        if (is_array(static::$factoryDefinitions) && !empty(static::$factoryDefinitions)) {
-            foreach (static::$factoryDefinitions as $target => $definition) {
-                $container->set($target, $definition);
+        // Add library definition file
+        $factory->addDefinitions(__DIR__ . '/Utility/Misc/FactoryDefinitions.php');
+        
+        // Add user definition files if available
+        if (property_exists(static::class, 'factoryDefinitions') &&
+            !empty(static::$factoryDefinitions) &&
+            is_array(static::$factoryDefinitions)
+        ) {
+            foreach (static::$factoryDefinitions as $file) {
+                Assert::file($file, "The definition source '%s' is no file!");
+                Assert::readable($file, "The definition source '%s' is not readable!");
+                
+                $factory->addDefinitions($file);
             }
         }
 
-        $container->set(ContainerInterface::class, $container);
-        $container->set(DocBlockFactory::class, DI\factory([DocBlockFactory::class, 'createInstance']));
-
-        static::$container = $container;
-
-        return $container;
+        return (static::$container = $factory->build());
     }
 
     /**
@@ -244,7 +244,7 @@ class Console extends DefaultApplicationConfig
             Assert::allString($config['commands'], 'Expected an array of commands as string!');
 
             foreach ($config['commands'] as $handlerClass) {
-                $this->addCommand($handlerClass);
+                $this->analyzer->addCommand($handlerClass, $this);
             }
         }
 
@@ -252,227 +252,7 @@ class Console extends DefaultApplicationConfig
             Assert::isArray($config['options'], 'Expected an array of options, got %s!');
 
             foreach ($config['options'] as $optionConfig) {
-            }
-        }
-    }
-
-    public function addCommand(string $class)
-    {
-        Assert::classExists($class, "The command handler class '$class' does not exist!");
-        Assert::subclassOf($class, AbstractCommand::class, "The command handler class '$class' does not inherit from 'MCStreetguy\\SmartConsole\\Command\\AbstractCommand'!");
-
-        $reflector = new \ReflectionClass($class);
-
-        $className = $reflector->getShortName();
-
-        Assert::endsWith($className, 'Command', "The command handler class '$class' has an invalid name: '%s'!");
-
-        $commandName = str_replace('Command', '', $className);
-        $commandName = StringHelper::camelToSnakeCase($commandName);
-
-        $command = $this->beginCommand($commandName);
-
-        $classDocBlock = $reflector->getDocComment();
-
-        Assert::notEmpty($classDocBlock, "The command handler class '$class' is missing a descriptive docblock!");
-
-        $classDocBlock = $this->docBlockFactory->create($classDocBlock);
-
-        $summary = $classDocBlock->getSummary();
-
-        Assert::notEmpty($summary, "The command handler doc-block of '$class' is missing a summary!");
-
-        $command->setDescription($summary);
-
-        if (!empty($description = (string) $classDocBlock->getDescription())) {
-            $description = HelpTextUtility::convertToHelpText($description);
-            $command->setHelp($description);
-        }
-
-        $container = &static::$container;
-        $command->setHandler(function () use ($class, $container) {
-            return $container->get($class);
-        });
-
-        $methods = $reflector->getMethods(\ReflectionMethod::IS_PUBLIC | ~\ReflectionMethod::IS_STATIC);
-
-        Assert::notEmpty($methods, "The command handler class '$class' defines no valid methods!");
-
-        $actionMethods = array_filter($methods, function (\ReflectionMethod $elem) {
-            return (bool) preg_match('/Action$/', $elem->getName());
-        });
-
-        Assert::notEmpty($actionMethods, "The command handler class '$class' defines no valid action methods!");
-
-        if (count($actionMethods) === 1) {
-            $method = array_shift($actionMethods);
-            $cmdName = str_replace('Action', '', $method->getName());
-
-            $command->setHandlerMethod("${cmdName}Cmd");
-
-            $this->addArgsAndOptions($command, $method, $class);
-        } else {
-            foreach ($actionMethods as $method) {
-                $cmdName = str_replace('Action', '', $method->getName());
-
-                $subCommand = $command->beginSubCommand(StringHelper::camelToSnakeCase($cmdName));
-                $subCommand->setHandlerMethod("${cmdName}Cmd");
-
-                if ($this->annotationReader->getMethodAnnotation($method, DefaultCommand::class) !== null) {
-                    $subCommand->markDefault();
-
-                    if ($this->annotationReader->getMethodAnnotation($method, AnonymousCommand::class) !== null) {
-                        $subCommand->markAnonymous();
-                    }
-                }
-
-                $this->addArgsAndOptions($subCommand, $method, $class);
-
-                $subCommand->end();
-            }
-        }
-
-        $command->end();
-    }
-
-    /**
-     * @internal
-     * @param CommandConfig $config The config instance
-     * @param \ReflectionMethod $method The method to analyze
-     * @param string $class The class name that is currently beeing processed
-     * @return void
-     */
-    protected function addArgsAndOptions(CommandConfig &$config, \ReflectionMethod $method, string $class)
-    {
-        $cmdName = str_replace('Action', '', $method->getName());
-
-        $methodDocBlock = $method->getDocComment();
-        Assert::notEmpty($methodDocBlock, "The action method '$cmdName' in class '$class' is missing a descriptive docblock!");
-        $methodDocBlock = $this->docBlockFactory->create($methodDocBlock);
-
-        $commandSummary = $methodDocBlock->getSummary();
-        Assert::notEmpty($commandSummary, "The action method doc-block for '$cmdName' in '$class' is missing a summary!");
-        $config->setDescription($commandSummary);
-
-        $commandDescription = (string) $methodDocBlock->getDescription();
-
-        if (!empty($commandDescription)) {
-            $commandDescription = HelpTextUtility::convertToHelpText($commandDescription);
-            $config->setHelp($commandDescription);
-        }
-
-        $params = $method->getParameters();
-
-        foreach ($params as $parameter) {
-            $name = $parameter->getName();
-            $description = null;
-
-            $paramTags = $methodDocBlock->getTagsByName('param');
-            $paramTags = array_values(array_filter($paramTags, function (Param $elem) use ($name) {
-                return ($elem->getVariableName() === $name);
-            }));
-
-            if (!empty($paramTags)) {
-                $paramTag = $paramTags[0];
-                $description = (string) $paramTag->getDescription();
-            }
-
-            if ($parameter->isOptional()) {
-                $defaultValue = $parameter->getDefaultValue();
-
-                $optionName = StringHelper::camelToSnakeCase($name);
-                $shortNameMap = array_filter($this->annotationReader->getMethodAnnotations($method), function ($elem) use ($optionName) {
-                    return ($elem instanceof ShortName) && ($elem->getOption() === $optionName);
-                });
-
-                if (!empty($shortNameMap)) {
-                    $shortName = $shortNameMap[0]->getShort();
-                    $flags = Option::PREFER_SHORT_NAME;
-                } else {
-                    $shortName = null;
-                    $flags = Option::PREFER_LONG_NAME;
-                }
-
-                if ($parameter->hasType()) {
-                    $type = $parameter->getType();
-                    $type = $type->getName();
-                } else {
-                    $type = gettype($defaultValue);
-                }
-
-                switch ($type) {
-                    case 'bool':
-                        $flags = $flags | Option::BOOLEAN | Option::NO_VALUE;
-                        $defaultValue = null;
-                        break;
-                    case 'boolean':
-                        $flags = $flags | Option::BOOLEAN | Option::NO_VALUE;
-                        $defaultValue = null;
-                        break;
-                    case 'int':
-                        $flags = $flags | Option::INTEGER | Option::REQUIRED_VALUE;
-                        break;
-                    case 'integer':
-                        $flags = $flags | Option::INTEGER | Option::REQUIRED_VALUE;
-                        break;
-                    case 'double':
-                        $flags = $flags | Option::FLOAT | Option::REQUIRED_VALUE;
-                        break;
-                    case 'float':
-                        $flags = $flags | Option::FLOAT | Option::REQUIRED_VALUE;
-                        break;
-                    case 'string':
-                        $flags = $flags | Option::STRING | Option::REQUIRED_VALUE;
-                        break;
-                    default:
-                        throw new ConfigurationException(
-                            "Option '$name' in subcommand '$cmdName' has an invalid type!",
-                            1538600675
-                        );
-                }
-
-                if ($parameter->isVariadic()) {
-                    $flags = $flags | Option::MULTI_VALUED;
-                }
-
-                $config->addOption($optionName, $shortName, $flags, $description, $defaultValue);
-            } else {
-                $flags = Argument::REQUIRED;
-
-                if ($parameter->hasType()) {
-                    $type = $parameter->getType();
-
-                    switch ((string) $type) {
-                        case 'boolean':
-                            $flags = $flags | Argument::BOOLEAN;
-                            break;
-                        case 'integer':
-                            $flags = $flags | Argument::INTEGER;
-                            break;
-                        case 'double':
-                            $flags = $flags | Argument::FLOAT;
-                            break;
-                        case 'float':
-                            $flags = $flags | Argument::FLOAT;
-                            break;
-                        case 'string':
-                            $flags = $flags | Argument::STRING;
-                            break;
-                        default:
-                            throw new ConfigurationException(
-                                "Argument '$name' in subcommand '$cmdName' has an invalid type!",
-                                1538597361
-                            );
-                    }
-                } else {
-                    $flags = $flags | Argument::STRING;
-                }
-
-                if ($parameter->isVariadic()) {
-                    $flags = $flags | Argument::MULTI_VALUED;
-                }
-
-                $config->addArgument($name, $flags, $description);
+                UnsupportedFeatureException::forFeatureName('global options');
             }
         }
     }
