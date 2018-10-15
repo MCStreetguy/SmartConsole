@@ -12,12 +12,14 @@ use MCStreetguy\SmartConsole\Annotations\Command\AnonymousCommand;
 use MCStreetguy\SmartConsole\Annotations\Command\DefaultCommand;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
+use MCStreetguy\SmartConsole\Exceptions\ErrorException;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
 use MCStreetguy\SmartConsole\Utility\RawIO;
-use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlock\Tag;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use phpDocumentor\Reflection\DocBlockFactory;
+use Psr\Container\ContainerInterface;
 use Webmozart\Assert\Assert;
 use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
@@ -25,7 +27,6 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
-use MCStreetguy\SmartConsole\Exceptions\ErrorException;
 
 class Console extends DefaultApplicationConfig
 {
@@ -123,6 +124,8 @@ class Console extends DefaultApplicationConfig
                 $container->set($target, $definition);
             }
         }
+
+        $container->set(ContainerInterface::class, $container);
 
         $this->container = $container;
 

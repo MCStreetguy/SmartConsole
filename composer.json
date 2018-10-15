@@ -17,7 +17,8 @@
         "phpdocumentor/reflection-docblock": "^4.3",
         "doctrine/annotations": "^1.6",
         "psr/log": "^1.0",
-        "php-di/php-di": "^6.0"
+        "php-di/php-di": "^6.0",
+        "psr/container": "^1.0"
     },
     "require-dev": {
         "kint-php/kint": "^3.0"
