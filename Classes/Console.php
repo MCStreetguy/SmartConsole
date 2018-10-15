@@ -27,14 +27,10 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
+use DI\Container;
 
 class Console extends DefaultApplicationConfig
 {
-    /**
-     * @var Container
-     */
-    protected $container;
-
     /**
      * @var AnnotationReader
      */
@@ -49,6 +45,11 @@ class Console extends DefaultApplicationConfig
      * @var array
      */
     protected static $factoryDefinitions = [];
+
+    /**
+     * @var Container
+     */
+    protected static $container;
 
     public static function run(ApplicationConfig $config = null)
     {
@@ -102,17 +103,16 @@ class Console extends DefaultApplicationConfig
         ini_set('display_startup_errors', 1);
     }
 
-    public function execute()
-    {
-        static::run($this);
-    }
-
     /**
-     * @inheritDoc
+     * Get the DI-container instance.
+     * @return Container
      */
-    public function __construct($name = null, $version = null)
+    public static function getContainer() : Container
     {
-        # Dependency Container
+        if (!empty(static::$container)) {
+            return static::$container;
+        }
+
         $factory = new ContainerBuilder();
         $factory->useAnnotations(true);
         $factory->useAutowiring(true);
@@ -126,18 +126,35 @@ class Console extends DefaultApplicationConfig
         }
 
         $container->set(ContainerInterface::class, $container);
+        $container->set(DocBlockFactory::class, DI\factory([DocBlockFactory::class, 'createInstance']));
 
-        $this->container = $container;
+        static::$container = $container;
 
-        # Annotation Reader
+        return $container;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct($name = null, $version = null)
+    {
+        # Prerequisites
         AnnotationRegistry::registerLoader('class_exists');
-        $this->annotationReader = new AnnotationReader();
 
-        # DocBlockParser
-        $this->docBlockFactory = DocBlockFactory::createInstance();
+        # Dependencies
+        $container = static::getContainer();
+        $container->injectOn($this);
 
         # Further init
         parent::__construct($name, $version);
+    }
+
+    /**
+     * Execute the application.
+     */
+    public function execute()
+    {
+        static::run($this);
     }
 
     /**
@@ -272,7 +289,7 @@ class Console extends DefaultApplicationConfig
             $command->setHelp($description);
         }
 
-        $container = &$this->container;
+        $container = &static::$container;
         $command->setHandler(function () use ($class, $container) {
             return $container->get($class);
         });
