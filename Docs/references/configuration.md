@@ -15,3 +15,5 @@ Below you find a detailled reference of all available configuration options for 
 | `options` | `array` | No | An array of global options that shall be available application-wide. |
 
 ## Methods
+
+_(to be written)_

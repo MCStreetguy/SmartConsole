@@ -45,8 +45,8 @@ abstract class AbstractCommand
 
     final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
-        $this->io = new IO($io);
         $this->args = new Args($args);
+        $this->io = new IO($io, $this->args);
 
         $reflector = new \ReflectionMethod(static::class . '::' . $name);
 

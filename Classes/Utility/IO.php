@@ -12,6 +12,11 @@ use Webmozart\Console\UI\Style\TableStyle;
 
 class IO extends RawIO
 {
+    const NORMAL = IOApi::NORMAL;
+    const VERBOSE = IOApi::VERBOSE;
+    const VERY_VERBOSE = IOApi::VERY_VERBOSE;
+    const DEBUG = IOApi::DEBUG;
+
     /**
      * @var IOApi
      */
@@ -28,15 +33,24 @@ class IO extends RawIO
     protected $currentProgressTotal;
 
     /**
+     * If the --no-ansi option has been specified, thus no formatted output is allowed.
+     * @var bool
+     */
+    protected $noAnsi;
+
+    /**
      * Constructs a new instance.
      *
      * @param IOApi $io
      */
-    public function __construct(IOApi $io)
+    public function __construct(IOApi $io, Args $args)
     {
         parent::__construct();
 
         $this->io = $io;
+
+        // Resolve further info
+        $this->noAnsi = (!$args->getOption('ansi') && $args->getOption('no-ansi'));
     }
 
     // State-properties
@@ -144,6 +158,27 @@ class IO extends RawIO
         return $this->io->isQuiet();
     }
 
+    /**
+     * Set if the output should omit ANSI codes.
+     *
+     * @param bool $noAnsi
+     * @return void
+     */
+    public function setNoAnsi(bool $noAnsi)
+    {
+        $this->noAnsi = $noAnsi;
+    }
+
+    /**
+     * Get if the output should omit ANSI codes.
+     *
+     * @return bool
+     */
+    public function isNoAnsi() : bool
+    {
+        return $this->noAnsi;
+    }
+
     // Input
 
     /**
@@ -174,6 +209,10 @@ class IO extends RawIO
         string $hintColor = 'cyan',
         string $hintBackground = null
     ) {
+        if ($this->isQuiet() || !$this->isInteractive()) {
+            return $default;
+        }
+
         $climate = $this->climate($color, $background);
 
         if ($hidden) {
@@ -228,6 +267,10 @@ class IO extends RawIO
         string $color = 'yellow',
         string $background = null
     ) {
+        if ($this->isQuiet() || !$this->isInteractive()) {
+            return $default;
+        }
+
         $input = $this->climate($color, $background)->input($question);
         $input->accept($answers, $hint);
 
@@ -253,6 +296,10 @@ class IO extends RawIO
      */
     public function confirm(string $question, string $color = 'yellow', string $background = null): bool
     {
+        if ($this->isQuiet() || !$this->isInteractive()) {
+            return false;
+        }
+
         $confirmation = $this->climate($color, $background)->confirm($question);
         return $confirmation->confirmed();
     }
@@ -268,6 +315,10 @@ class IO extends RawIO
      */
     public function checkboxes(string $question, array $options)
     {
+        if ($this->isQuiet() || !$this->isInteractive()) {
+            return null;
+        }
+
         $boxes = $this->climate->checkboxes($question, $options);
         return $boxes->prompt();
     }
@@ -283,6 +334,10 @@ class IO extends RawIO
      */
     public function radiobuttons(string $question, array $options)
     {
+        if ($this->isQuiet() || !$this->isInteractive()) {
+            return null;
+        }
+
         $radio = $this->climate->radio($question, $options);
         return $radio->prompt();
     }
@@ -298,6 +353,10 @@ class IO extends RawIO
      */
     public function simpleTable(array $data, bool $borderless = false)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         if ($borderless) {
             $list = new Table(TableStyle::borderless());
         } else {
@@ -321,6 +380,10 @@ class IO extends RawIO
      */
     public function table(array $data, bool $borderless = false)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         Assert::allIsArray($data);
 
         if ($borderless) {
@@ -350,6 +413,10 @@ class IO extends RawIO
      */
     public function columns(array $data, int $count = null, string $color = null, string $background = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         $climate = $this->climate($color, $background);
 
         if ($count !== null) {
@@ -381,6 +448,10 @@ class IO extends RawIO
         string $resultColor = null,
         string $resultBackground = null
     ) {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         if (is_string($size) && substr($size, 0, 1) === '+') {
             $add = intval(substr($size, 1));
             $size = null;
@@ -449,6 +520,10 @@ class IO extends RawIO
      */
     public function border(string $pattern = null, int $size = null, string $color = null, string $background = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         $this->climate($color, $background)->border($pattern, $size);
     }
 
@@ -465,6 +540,10 @@ class IO extends RawIO
      */
     public function startProgressBar(int $total = 100, string $color = null, string $background = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         Assert::null($this->currentProgress, 'You cannot start multiple progress bars at once!');
 
         $this->currentProgressTotal = $total;
@@ -483,6 +562,10 @@ class IO extends RawIO
      */
     public function setProgress(int $progress, string $label = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         Assert::notNull($this->currentProgress, 'You must start a progress bar before you can set the progress on it!');
 
         $this->currentProgress->current($progress, $label);
@@ -500,6 +583,10 @@ class IO extends RawIO
      */
     public function advanceProgress(int $step, string $label = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         Assert::notNull($this->currentProgress, 'You must start a progress bar before you can advance the progress on it!');
 
         $this->currentProgress->advance($step, $label);
@@ -516,9 +603,185 @@ class IO extends RawIO
      */
     public function finishProgress(string $label = null)
     {
+        if ($this->isQuiet()) {
+            return;
+        }
+
         $this->currentProgress->current($this->currentProgressTotal, $label);
 
         $this->currentProgress = null;
         $this->currentProgressTotal = null;
+    }
+
+    // Override parent methods with more complex functionality
+
+    /**
+     * @inheritDoc
+     */
+    public function emergency($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::emergency($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function alert($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::alert($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function critical($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::critical($message, $context);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function error($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::error($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function warning($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::warning($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function notice($message, array $context = [])
+    {
+        if ($this->isQuiet() || $this->getVerbosity() < static::VERY_VERBOSE) {
+            return;
+        }
+
+        parent::notice($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function info($message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::info($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function debug($message, array $context = [])
+    {
+        if ($this->isQuiet() || $this->getVerbosity() < static::DEBUG) {
+            return;
+        }
+
+        parent::debug($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function log($level, $message, array $context = [])
+    {
+        if ($this->isQuiet() || $level > $this->getVerbosity()) {
+            return;
+        }
+
+        parent::log($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function out(string $message, array $context = [], string $color = null, string $background = null)
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::out($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function success(string $message, array $context = [])
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::success($message, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function newline(int $count = 1)
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::newline($count);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function clear()
+    {
+        if ($this->isQuiet()) {
+            return;
+        }
+
+        parent::clear();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function climate(string $color = null, string $background = null): CLImate
+    {
+        $climate = parent::climate($color, $background);
+
+        if ($this->isNoAnsi()) {
+            $climate->style->reset();
+        }
+
+        return $climate;
     }
 }
