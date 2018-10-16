@@ -1,9 +1,11 @@
 site_name: SmartConsole
 site_description: The official documentation of SmartConsole.
 site_author: Maximilian Schmidt
-site_url: https://smartconsole.readthedocs.io
-
 copyright: Copyright &copy; 2018 Maximilian Schmidt
+
+site_url: https://smartconsole.readthedocs.io
+repo_url: https://github.com/MCStreetguy/SmartConsole
+edit_uri: blob/master/Docs/
 
 docs_dir: Docs
 

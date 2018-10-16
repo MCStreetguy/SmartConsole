@@ -116,7 +116,7 @@ _(to be written)_
 
 ---------------------------
 
-## `RawIO` vs. `IO`
+## RawIO vs. IO
 
 It may occur, that you need to output something during startup of your application.
 This is done by using a preliminary (or raw) IO, which lacks most of the dynamic features but is capable of basic output.
