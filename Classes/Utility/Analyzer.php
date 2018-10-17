@@ -42,6 +42,8 @@ class Analyzer
      * Constructs a new instance.
      *
      * @param Container $container
+     * @param AnnotationReader $annotationReader
+     * @param DocBlockFactory $docBlockFactory
      */
     public function __construct(Container $container, AnnotationReader $annotationReader, DocBlockFactory $docBlockFactory)
     {
@@ -91,7 +93,7 @@ class Analyzer
             $command->setHelp($description);
         }
 
-        $container = &$this->$container;
+        $container = &$this->container;
         $command->setHandler(function () use ($class, $container) {
             return $container->get($class);
         });
