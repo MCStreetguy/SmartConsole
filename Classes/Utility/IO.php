@@ -738,8 +738,6 @@ class IO extends RawIO
             return;
         }
 
-        \Kint::dump($level, $message, $context, $this->getVerbosity());
-
         parent::log($level, $message, $context);
     }
 
