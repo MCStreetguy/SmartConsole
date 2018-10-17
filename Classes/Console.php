@@ -39,9 +39,22 @@ class Console extends DefaultApplicationConfig
     protected static $container;
 
     /**
+     * @Inject
      * @var Analyzer
      */
     protected $analyzer;
+
+    /**
+     * @Inject
+     * @var AnnotationReader
+     */
+    protected $annotationReader;
+
+    /**
+     * @Inject
+     * @var DocBlockFactory
+     */
+    protected $docBlockFactory;
 
     public static function run(ApplicationConfig $config = null)
     {
@@ -244,7 +257,7 @@ class Console extends DefaultApplicationConfig
             Assert::allString($config['commands'], 'Expected an array of commands as string!');
 
             foreach ($config['commands'] as $handlerClass) {
-                $this->analyzer->addCommand($handlerClass, $this);
+                $this->addCommand($handlerClass);
             }
         }
 
@@ -255,5 +268,12 @@ class Console extends DefaultApplicationConfig
                 UnsupportedFeatureException::forFeatureName('global options');
             }
         }
+    }
+
+    public function addCommand(string $class)
+    {
+        Assert::classExists($class, "Command handler class '%s' could not be found!");
+
+        return $this->analyzer->addCommand($class, $this);
     }
 }

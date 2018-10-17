@@ -2,17 +2,37 @@
 
 namespace MCStreetguy\SmartConsole\Utility;
 
-use Webmozart\Console\Api\Config\ApplicationConfig;
-use Webmozart\Assert\Assert;
-use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
-use MCStreetguy\SmartConsole\Console;
 use DI\Container;
-use Webmozart\Console\Api\Command\NoSuchCommandException;
-use Webmozart\Console\Api\Config\Config;
+use Doctrine\Common\Annotations\AnnotationReader;
+use MCStreetguy\SmartConsole\Annotations\Command\AnonymousCommand;
+use MCStreetguy\SmartConsole\Annotations\Command\DefaultCommand;
+use MCStreetguy\SmartConsole\Command\AbstractCommand;
+use MCStreetguy\SmartConsole\Console;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
+use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
+use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
+use phpDocumentor\Reflection\DocBlockFactory;
+use Webmozart\Assert\Assert;
+use Webmozart\Console\Api\Args\Format\Argument;
+use Webmozart\Console\Api\Args\Format\Option;
+use Webmozart\Console\Api\Command\NoSuchCommandException;
+use Webmozart\Console\Api\Config\ApplicationConfig;
+use Webmozart\Console\Api\Config\CommandConfig;
+use Webmozart\Console\Api\Config\Config;
 
 class Analyzer
 {
+    /**
+     * @var AnnotationReader
+     */
+    protected $annotationReader;
+
+    /**
+     * @var DocBlockFactory
+     */
+    protected $docBlockFactory;
+
     /**
      * @var Container
      */
@@ -23,9 +43,11 @@ class Analyzer
      *
      * @param Container $container
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, AnnotationReader $annotationReader, DocBlockFactory $docBlockFactory)
     {
         $this->container = $container;
+        $this->annotationReader = $annotationReader;
+        $this->docBlockFactory = $docBlockFactory;
     }
 
     /**
@@ -37,7 +59,7 @@ class Analyzer
     public function addCommand(string $class, ApplicationConfig &$config)
     {
         Assert::classExists($class, "The command handler class '$class' does not exist!");
-        Assert::subclassOf($class, AbstractCommand::class, "The command handler class '$class' does not inherit from 'MCStreetguy\\SmartConsole\\Command\\AbstractCommand'!");
+        Assert::subclassOf($class, AbstractCommand::class, "The command handler class '$class' does not inherit from '" . AbstractCommand::class . "'!");
 
         $reflector = new \ReflectionClass($class);
 
@@ -69,7 +91,7 @@ class Analyzer
             $command->setHelp($description);
         }
 
-        $container = static::$container;
+        $container = &$this->$container;
         $command->setHandler(function () use ($class, $container) {
             return $container->get($class);
         });
@@ -274,9 +296,9 @@ class Analyzer
             $config->getCommandConfig($name);
         } catch (NoSuchCommandException $e) {
             return false;
-        } finally {
-            return true;
         }
+
+        return true;
     }
 
     /**

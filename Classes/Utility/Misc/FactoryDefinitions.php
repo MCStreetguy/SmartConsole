@@ -2,6 +2,9 @@
 
 namespace MCStreetguy\SmartConsole\Utility\Misc;
 
+use function DI\get;
+use function DI\factory;
+
 use DI\Container;
 use MCStreetguy\SmartConsole\Console;
 use phpDocumentor\Reflection\DocBlockFactory;
@@ -13,11 +16,13 @@ use Psr\Container\ContainerInterface;
  * @see http://php-di.org/doc/php-definitions.html
  */
 return [
-    ContainerInterface::class => function () {
-        return Console::getContainer();
-    },
+    ContainerInterface::class => factory(function (ContainerInterface $container) {
+        return $container;
+    }),
 
-    Container::class => DI\get(ContainerInterface::class),
+    Container::class => get(ContainerInterface::class),
 
-    DocBlockFactory::class => DI\factory([DocBlockFactory::class, 'createInstance']),
+    DocBlockFactory::class => factory(function (ContainerInterface $container) {
+        return DocBlockFactory::createInstance();
+    }),
 ];
