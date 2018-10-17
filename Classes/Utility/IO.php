@@ -720,7 +720,7 @@ class IO extends RawIO
             return;
         }
 
-        parent::log($message, $context);
+        parent::log($level, $message, $context);
     }
 
     /**
