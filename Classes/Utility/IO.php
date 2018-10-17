@@ -47,10 +47,28 @@ class IO extends RawIO
     {
         parent::__construct();
 
-        $this->io = $io;
-
-        // Resolve further info
         $this->noAnsi = (!$args->getOption('ansi') && $args->getOption('no-ansi'));
+
+        switch ($args->getOption('verbose')) {
+            case 'null':
+                $verbosity = self::VERBOSE;
+                break;
+            case 'v':
+                $verbosity = self::VERY_VERBOSE;
+                break;
+            case 'vv':
+                $verbosity = self::DEBUG;
+                break;
+            default:
+                $verbosity = self::NORMAL;
+                break;
+        }
+
+        $io->setVerbosity($verbosity);
+        $io->setQuiet($args->getOption('quiet'));
+        $io->setInteractive(!$args->getOption('no-interaction'));
+
+        $this->io = $io;
     }
 
     // State-properties
@@ -174,7 +192,7 @@ class IO extends RawIO
      *
      * @return bool
      */
-    public function isNoAnsi() : bool
+    public function isNoAnsi(): bool
     {
         return $this->noAnsi;
     }
@@ -650,7 +668,7 @@ class IO extends RawIO
 
         parent::critical($message, $context);
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -719,6 +737,8 @@ class IO extends RawIO
         if ($this->isQuiet() || $level > $this->getVerbosity()) {
             return;
         }
+
+        \Kint::dump($level, $message, $context, $this->getVerbosity());
 
         parent::log($level, $message, $context);
     }
