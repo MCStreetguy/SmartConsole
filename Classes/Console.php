@@ -95,6 +95,7 @@ class Console extends DefaultApplicationConfig
             $code = $e->getCode();
 
             $io->emergency("Fatal: $message (Code: $code)");
+            die;
         };
 
         set_exception_handler($handler);
@@ -103,9 +104,8 @@ class Console extends DefaultApplicationConfig
             $converted = ErrorException::create($msg, $code);
             
             call_user_func($handler, $converted);
-        }, error_reporting());
+        }, E_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 
-        error_reporting(~E_ALL);
         ini_set('display_errors', 0);
         ini_set('display_startup_errors', 1);
     }
