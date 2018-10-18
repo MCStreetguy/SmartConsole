@@ -89,7 +89,7 @@ class Analyzer
         $command->setDescription($summary);
 
         if (!empty($description = (string)$classDocBlock->getDescription())) {
-            $description = HelpTextUtility::convertToHelpText($description);
+            // $description = HelpTextUtility::convertToHelpText($description);
             $command->setHelp($description);
         }
 
