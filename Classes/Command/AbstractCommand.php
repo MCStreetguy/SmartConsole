@@ -48,6 +48,10 @@ abstract class AbstractCommand
         $this->args = new Args($args);
         $this->io = new IO($io, $this->args);
 
+        if (method_exists($this, 'prepare')) {
+            call_user_func_array([$this, 'prepare'], []);
+        }
+
         $reflector = new \ReflectionMethod(static::class . '::' . $name);
 
         $params = $reflector->getParameters();
