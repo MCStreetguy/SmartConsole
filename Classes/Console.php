@@ -90,16 +90,19 @@ class Console extends DefaultApplicationConfig
     {
         $io = new RawIO;
 
-        $handler = function (\Exception $e) use ($io) {
-            $type = ($e instanceof ErrorException) ? 'Fatal' : get_class($e);
+        set_exception_handler(function (\Throwable $e) use ($io) {
+            if ($e instanceof \Error || $e instanceof \ErrorException || $e instanceof ErrorException) {
+                $type = 'Fatal';
+            } else {
+                $type = get_class($e);
+            }
+
             $message = $e->getMessage();
             $code = $e->getCode();
 
-            $io->emergency("$type: $message (Code: $code)");
-            die;
-        };
-
-        set_exception_handler($handler);
+            $io->emergency("$type: $message");
+            die($code);
+        });
 
         set_error_handler(function ($code, $msg) use ($handler) {
             $converted = ErrorException::create($msg, $code);
