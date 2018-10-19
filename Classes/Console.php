@@ -2,6 +2,7 @@
 
 namespace MCStreetguy\SmartConsole;
 
+use DI\Container;
 use DI\ContainerBuilder;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -12,7 +13,8 @@ use MCStreetguy\SmartConsole\Annotations\Command\AnonymousCommand;
 use MCStreetguy\SmartConsole\Annotations\Command\DefaultCommand;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
-use MCStreetguy\SmartConsole\Exceptions\ErrorException;
+use MCStreetguy\SmartConsole\Exceptions\UnsupportedFeatureException;
+use MCStreetguy\SmartConsole\Utility\Analyzer;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
 use MCStreetguy\SmartConsole\Utility\RawIO;
@@ -27,9 +29,6 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
-use DI\Container;
-use MCStreetguy\SmartConsole\Utility\Analyzer;
-use MCStreetguy\SmartConsole\Exceptions\UnsupportedFeatureException;
 
 class Console extends DefaultApplicationConfig
 {
@@ -91,7 +90,7 @@ class Console extends DefaultApplicationConfig
         $io = new RawIO;
 
         set_exception_handler(function (\Throwable $e) use ($io) {
-            if ($e instanceof \Error || $e instanceof \ErrorException || $e instanceof ErrorException) {
+            if ($e instanceof \Error || $e instanceof \ErrorException) {
                 $type = 'Fatal';
             } else {
                 $type = get_class($e);
@@ -104,10 +103,9 @@ class Console extends DefaultApplicationConfig
             die($code);
         });
 
-        set_error_handler(function ($code, $msg) use ($handler) {
-            $converted = ErrorException::create($msg, $code);
-            
-            call_user_func($handler, $converted);
+        set_error_handler(function ($code, $msg) use ($io) {
+            $io->emergency("Fatal: $msg");
+            die($code);
         }, E_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 
         ini_set('display_errors', 0);
