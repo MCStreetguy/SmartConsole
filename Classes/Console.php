@@ -172,6 +172,14 @@ class Console extends DefaultApplicationConfig
         static::run($this);
     }
 
+    protected function configure()
+    {
+        parent::configure();
+
+        $this->addOption('assume-yes', 'y', Option::NO_VALUE | Option::BOOLEAN, 'Assume yes as answer for all confirmations');
+        // $this->addOption('assume-no', null, Option::NO_VALUE | Option::BOOLEAN, 'Assume no as answer for all confirmations');
+    }
+
     /**
      * Analyses the current inheriting class in order to recieve the configuration options automatically from code.
      *

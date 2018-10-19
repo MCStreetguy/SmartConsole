@@ -39,6 +39,12 @@ class IO extends RawIO
     protected $noAnsi;
 
     /**
+     * If the --assume-yes option has been specified
+     * @var bool
+     */
+    protected $assumeYes;
+
+    /**
      * Constructs a new instance.
      *
      * @param IOApi $io
@@ -48,6 +54,7 @@ class IO extends RawIO
         parent::__construct();
 
         $this->noAnsi = (!$args->getOption('ansi') && $args->getOption('no-ansi'));
+        $this->assumeYes = $args->getOption('assume-yes');
 
         switch ($args->getOption('verbose')) {
             case 'null':
@@ -315,7 +322,7 @@ class IO extends RawIO
     public function confirm(string $question, string $color = 'yellow', string $background = null): bool
     {
         if ($this->isQuiet() || !$this->isInteractive()) {
-            return false;
+            return $this->assumeYes;
         }
 
         $confirmation = $this->climate($color, $background)->confirm($question);
