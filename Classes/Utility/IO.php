@@ -622,7 +622,7 @@ class IO extends RawIO
      *
      * NOTE: This requires to start a progress bar first!
      *
-     * @param string|null An optional label, describing the finalization
+     * @param string|null $label An optional label, describing the finalization
      * @return void
      * @throws \InvalidArgumentException
      */
@@ -636,6 +636,76 @@ class IO extends RawIO
 
         $this->currentProgress = null;
         $this->currentProgressTotal = null;
+    }
+
+    // Drawing
+
+    /**
+     * Print a padded message box to the terminal.
+     *
+     * @param string $message The message to print
+     * @param int $padding The padding to use horizontally
+     * @param int $margin The margin to the left edge of the terminal
+     * @param string $color The foreground color to use
+     * @param string $background The background color to use
+     * @return void
+     */
+    public function paddedBox(
+        string $message,
+        int $padding = 2,
+        int $margin = 0,
+        string $color = null,
+        string $background = null
+    ) {
+        $lines = explode(PHP_EOL, $message);
+
+        $maxLength = 0;
+        foreach ($lines as $line) {
+            if (($length = strlen($line)) > $maxLength) {
+                $maxLength = $length;
+            }
+        }
+
+        $maxLength += $padding * 2;
+
+        if ($margin !== null && $margin > 0) {
+            $tmp = '';
+            for ($i=0; $i < $margin; $i++) {
+                $tmp += ' ';
+            }
+            $margin = $tmp;
+        } else {
+            $margin = '';
+        }
+
+        if ($padding > 2) {
+            $tmp = '';
+            for ($i=0; $i < $padding; $i++) {
+                $tmp += ' ';
+            }
+            $padding = $tmp;
+        } else {
+            $padding = '  ';
+        }
+
+        $this->inline($margin);
+        for ($i=0; $i < $maxLength; $i++) {
+            $this->inline(' ', $context, $color, $background);
+        }
+        $this->inline(PHP_EOL);
+
+        foreach ($lines as $line) {
+            $this->inline($margin);
+            $this->inline($padding, [], $color, $background);
+            $this->out($line, $context, $color, $background);
+            $this->inline($padding, [], $color, $background);
+        }
+
+        $this->inline($margin);
+        for ($i = 0; $i < $maxLength; $i++) {
+            $this->inline(' ', [], $color, $background);
+        }
+        $this->inline(PHP_EOL);
     }
 
     // Override parent methods with more complex functionality

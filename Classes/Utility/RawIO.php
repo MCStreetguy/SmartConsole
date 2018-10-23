@@ -192,6 +192,22 @@ class RawIO implements LoggerInterface
     }
 
     /**
+     * Output an inline message to the terminal.
+     *
+     * @param string $message The message to print
+     * @param array|null $context Additional context variables that shall be interpolated into $message
+     * @param string|null $color The foreground color of the message
+     * @param string|null $background The background color of the message
+     * @return void
+     */
+    public function inline(string $message, array $context = [], string $color = null, string $background = null)
+    {
+        $this->climate($color, $background)->inline(
+            $this->interpolate($message, $context)
+        );
+    }
+
+    /**
      * Print a success-message to the terminal.
      *
      * @param string $message The message to print
