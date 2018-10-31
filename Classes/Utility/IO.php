@@ -204,6 +204,27 @@ class IO extends RawIO
         return $this->noAnsi;
     }
 
+    /**
+     * Set if answers should default to 'yes' in quiet mode.
+     *
+     * @param bool $assumeYes
+     * @return void
+     */
+    public function setAssumeYes(bool $assumeYes)
+    {
+        $this->assumeYes = $assumeYes;
+    }
+
+    /**
+     * Get if answers default to 'yes' in quiet mode.
+     *
+     * @return bool
+     */
+    public function isYesAssumed() : bool
+    {
+        return $this->assumeYes;
+    }
+
     // Input
 
     /**
