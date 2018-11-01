@@ -16,22 +16,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+**Added**
 
 - Automated app-configuration by reflecting the main class
 - Simple command definition through reflection of the command handler classes
 - Basic configuration annotations
-- Comprehensive and dynamic Input-Output-System
+- Comprehensive and dynamic input-output system with integrated file logger
 - Global dependency injection container with support for autowiring and annotation-based injection
 - Error and exception handlers with enduser-friendly output formatting
 - Static application runner for simplified execution
 
-<!-- ### Changed -->
+**Changed**
 
-<!-- ### Deprecated -->
+- _..._
 
-<!-- ### Removed -->
+**Deprecated**
 
-<!-- ### Fixed -->
+- _..._
 
-<!-- ### Security -->
+**Removed**
+
+- _..._
+
+**Fixed**
+
+- _..._
+
+**Security**
+
+- _..._

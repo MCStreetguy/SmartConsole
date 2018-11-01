@@ -10,6 +10,9 @@ use Webmozart\Console\Api\IO\IO as IOApi;
 use Webmozart\Console\UI\Component\Table;
 use Webmozart\Console\UI\Style\TableStyle;
 
+/**
+ * The main IO component.
+ */
 class IO extends RawIO
 {
     const NORMAL = IOApi::NORMAL;

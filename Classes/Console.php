@@ -29,6 +29,7 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
+use MCStreetguy\SmartConsole\Annotations\Application\LogDir;
 
 class Console extends DefaultApplicationConfig
 {
@@ -36,6 +37,12 @@ class Console extends DefaultApplicationConfig
      * @var Container
      */
     protected static $container;
+
+    /**
+     * The log-directory of the application.
+     * @var string|null
+     */
+    protected static $logDir;
 
     /**
      * @Inject
@@ -185,7 +192,7 @@ class Console extends DefaultApplicationConfig
     }
 
     /**
-     * Prepare the configuration with common settings.
+     * Prepare the configuration instance with common settings.
      *
      * @return void
      */
@@ -199,13 +206,6 @@ class Console extends DefaultApplicationConfig
             Option::NO_VALUE | Option::BOOLEAN,
             'Assume yes as answer for all confirmations'
         );
-
-        // $this->addOption(
-        //     'assume-no',
-        //     null,
-        //     Option::NO_VALUE | Option::BOOLEAN,
-        //     'Assume no as answer for all confirmations'
-        // );
     }
 
     /**
@@ -236,6 +236,12 @@ class Console extends DefaultApplicationConfig
         $displayNameAnnotation = $this->annotationReader->getClassAnnotation($reflector, DisplayName::class);
         if ($displayNameAnnotation !== null) {
             $config['displayName'] = $displayNameAnnotation->getName();
+        }
+
+        /** @var LogDir|null $logDirAnnotation */
+        $logDirAnnotation = $this->annotationReader->getClassAnnotation($reflector, LogDir::class);
+        if ($logDirAnnotation !== null) {
+            $config['logDir'] = $logDirAnnotation->getPath();
         }
 
         $helpText = $classSummary = $classDocBlock->getSummary();
@@ -290,6 +296,11 @@ class Console extends DefaultApplicationConfig
             $this->setDebug($config['debugMode']);
         }
 
+        if (array_key_exists('logDir', $config)) {
+            Assert::string($config['logDir'], 'Expected a string as logging directory, got %s!');
+            $this->setLogDir($config['logDir']);
+        }
+
         if (array_key_exists('commands', $config)) {
             Assert::isArray($config['commands'], 'Expected an array of commands, got %s!');
             Assert::allString($config['commands'], 'Expected an array of commands as string!');
@@ -319,5 +330,51 @@ class Console extends DefaultApplicationConfig
         Assert::classExists($class, "Command handler class '%s' could not be found!");
 
         return $this->analyzer->addCommand($class, $this);
+    }
+
+    /**
+     * Set the logging directory of the application.
+     *
+     * @param string $dir The logging-directory path
+     * @return self
+     */
+    public static function setLogDirPath(string $dir) : self
+    {
+        Assert::directory($dir, "Invalid log-directory: %s!");
+
+        self::$logDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Get the logging-directory of the application.
+     *
+     * @return string|null
+     */
+    public static function getLogDirPath()
+    {
+        return self::$logDir;
+    }
+
+    /**
+     * Set the logging directory of the application.
+     *
+     * @param string $dir The logging-directory path
+     * @return self
+     */
+    public function setLogDir(string $dir)
+    {
+        return self::setLogDirPath($dir);
+    }
+
+    /**
+     * Get the logging-directory of the application.
+     *
+     * @return string|null
+     */
+    public function getLogDir()
+    {
+        return self::getLogDirPath();
     }
 }

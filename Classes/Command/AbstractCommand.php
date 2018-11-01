@@ -5,14 +5,17 @@ namespace MCStreetguy\SmartConsole\Command;
 use Webmozart\Console\Api\Args\Args as ArgsApi;
 use Webmozart\Console\Api\IO\IO as IOApi;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
-use MCStreetguy\SmartConsole\Utility\IO;
+use MCStreetguy\SmartConsole\Utility\Logger;
 use MCStreetguy\SmartConsole\Utility\Args;
 use Webmozart\Console\Api\Command\Command;
 
+/**
+ * The base class for command handlers.
+ */
 abstract class AbstractCommand
 {
     /**
-     * @var IO
+     * @var Logger
      */
     protected $io;
 
@@ -21,6 +24,15 @@ abstract class AbstractCommand
      */
     protected $args;
 
+    /**
+     * Magic function for calls to undefined methods.
+     * Used to intercept invokation of command handler methods and redirecting of the call through the 'invoke' method.
+     *
+     * @see http://php.net/manual/de/language.oop5.overloading.php#object.call
+     * @param string $name The method name
+     * @param array $arguments Method call arguments
+     * @return mixed
+     */
     final public function __call($name, $arguments)
     {
         if ($name === 'handle') {
@@ -43,10 +55,19 @@ abstract class AbstractCommand
         return call_user_func_array([$this, $name], $arguments);
     }
 
+    /**
+     * Prepare the command handler class and invoke the desired handler method.
+     *
+     * @param ArgsApi $args The underlying Args instance from webmozart/console
+     * @param IOApi $io The underlying IO instance from webmozart/console
+     * @param Command $cmd The invoked command
+     * @param string $name The name of the command handler method
+     * @return int
+     */
     final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
         $this->args = new Args($args);
-        $this->io = new IO($io, $this->args);
+        $this->io = new Logger($io, $this->args);
 
         if (method_exists($this, 'prepare')) {
             call_user_func_array([$this, 'prepare'], []);
