@@ -341,15 +341,13 @@ class Console extends DefaultApplicationConfig
      * Set the logging directory of the application.
      *
      * @param string $dir The logging-directory path
-     * @return self
+     * @return void
      */
     public static function setLogDirPath(string $dir) : self
     {
         Assert::directory($dir, "Invalid log-directory: %s!");
 
         self::$logDir = $dir;
-
-        return $this;
     }
 
     /**
@@ -370,7 +368,9 @@ class Console extends DefaultApplicationConfig
      */
     public function setLogDir(string $dir)
     {
-        return self::setLogDirPath($dir);
+        self::setLogDirPath($dir);
+
+        return $this;
     }
 
     /**
