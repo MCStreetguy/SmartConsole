@@ -9,6 +9,7 @@ use DI\Container;
 use MCStreetguy\SmartConsole\Console;
 use phpDocumentor\Reflection\DocBlockFactory;
 use Psr\Container\ContainerInterface;
+use Monolog\Logger;
 
 /**
  * Static factory definitions.

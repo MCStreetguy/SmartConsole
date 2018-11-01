@@ -30,6 +30,8 @@ use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
 use MCStreetguy\SmartConsole\Annotations\Application\LogDir;
+use MCStreetguy\SmartConsole\Utility\Logger;
+use MCStreetguy\SmartConsole\Utility\Misc\LoggerFactory;
 
 class Console extends DefaultApplicationConfig
 {
@@ -106,8 +108,9 @@ class Console extends DefaultApplicationConfig
     public static function registerHandlers()
     {
         $io = new RawIO;
+        $logger = LoggerFactory::build();
 
-        set_exception_handler(function (\Throwable $e) use ($io) {
+        set_exception_handler(function (\Throwable $e) use ($io, $logger) {
             if ($e instanceof \Error || $e instanceof \ErrorException) {
                 $type = 'Fatal';
             } else {
@@ -117,12 +120,14 @@ class Console extends DefaultApplicationConfig
             $message = $e->getMessage();
             $code = $e->getCode();
 
-            $io->emergency("$type: $message");
+            $io->emergency($msg = "$type: $message");
+            ($logger !== null) && $logger->addEmergency($msg);
             die($code);
         });
 
-        set_error_handler(function ($code, $msg) use ($io) {
+        set_error_handler(function ($code, $msg) use ($io, $logger) {
             $io->emergency("Fatal: $msg");
+            ($logger !== null) && $logger->addEmergency($msg);
             die($code);
         }, E_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 

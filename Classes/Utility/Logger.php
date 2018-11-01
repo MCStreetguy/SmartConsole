@@ -14,6 +14,8 @@ use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Processor\ProcessIdProcessor;
 use Monolog\Processor\UidProcessor;
 use Monolog\Formatter\LineFormatter;
+use Webmozart\Assert\Assert;
+use MCStreetguy\SmartConsole\Utility\Misc\LoggerFactory;
 
 /**
  * The extended logging-component, bundling the IO and Logfiles.
@@ -32,31 +34,7 @@ class Logger extends IO
     {
         parent::__construct($io, $args);
 
-        $logPath = Console::getLogDirPath();
-        
-        if (!empty($logPath)) {
-            $formatter = new LineFormatter('%datetime% > %level_name% > %message% %context% %extra%' . PHP_EOL);
-
-            $debugHandler = new RotatingFileHandler("$logPath/debug.log", 5, Monologger::DEBUG, false, 0644, true);
-            $debugHandler->setFormatter($formatter);
-
-            $defaultHandler = new RotatingFileHandler("$logPath/application.log", 10, Monologger::INFO, true, 0644, true);
-            $defaultHandler->setFormatter($formatter);
-
-            $errorHandler = new RotatingFileHandler("$logPath/error.log", 15, Monologger::ERROR, false, 0644, true);
-            $errorHandler->setFormatter($formatter);
-            $errorHandler->pushProcessor(new MemoryUsageProcessor(true, true));
-            $errorHandler->pushProcessor(new MemoryPeakUsageProcessor(true, true));
-            $errorHandler->pushProcessor(new ProcessIdProcessor);
-            $errorHandler->pushProcessor(new UidProcessor(16));
-            $errorHandler->pushProcessor(new IntrospectionProcessor(Monologger::ERROR));
-
-            $this->logger = new Monologger('app', [
-                $errorHandler,
-                $defaultHandler,
-                $debugHandler,
-            ], [new PsrLogMessageProcessor]);
-        }
+        $this->logger = LoggerFactory::build();
     }
 
     /**
