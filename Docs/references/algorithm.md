@@ -6,7 +6,7 @@ This is to prevent configuration errors of your commands since any information i
 Any of the single parts throws an exception of type `MCStreetguy\SmartConsole\Exceptions\ConfigurationException` when anything goes wrong if not stated otherwise in the belonging section.
 
 !!! tip "Developers Note"
-    If you prefer to understand the procedure yourself, you are welcome to have a look at the [source code](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Console.php#L157).
+    If you prefer to understand the procedure yourself, you are welcome to have a look at the [source code](https://github.com/mcstreetguy/smartconsole/blob/master/Classes/Utility/Analyzer.php#L61).
 
 ## Procedure
 

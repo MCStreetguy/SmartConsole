@@ -55,6 +55,12 @@ class Console extends DefaultApplicationConfig
      */
     protected $docBlockFactory;
 
+    /**
+     * Run the application.
+     *
+     * @param ApplicationConfig|null $config Optional configuration object to use for execution.
+     * @return void
+     */
     public static function run(ApplicationConfig $config = null)
     {
         if ($config === null) {
@@ -85,6 +91,11 @@ class Console extends DefaultApplicationConfig
         exit($code);
     }
 
+    /**
+     * Register the internal error and exception handlers.
+     *
+     * @return void
+     */
     public static function registerHandlers()
     {
         $io = new RawIO;
@@ -113,7 +124,8 @@ class Console extends DefaultApplicationConfig
     }
 
     /**
-     * Get the DI-container instance.
+     * Get the dependency container.
+     *
      * @return Container
      */
     public static function getContainer() : Container
@@ -172,16 +184,32 @@ class Console extends DefaultApplicationConfig
         static::run($this);
     }
 
+    /**
+     * Prepare the configuration with common settings.
+     *
+     * @return void
+     */
     protected function configure()
     {
         parent::configure();
 
-        $this->addOption('assume-yes', 'y', Option::NO_VALUE | Option::BOOLEAN, 'Assume yes as answer for all confirmations');
-        // $this->addOption('assume-no', null, Option::NO_VALUE | Option::BOOLEAN, 'Assume no as answer for all confirmations');
+        $this->addOption(
+            'assume-yes',
+            'y',
+            Option::NO_VALUE | Option::BOOLEAN,
+            'Assume yes as answer for all confirmations'
+        );
+
+        // $this->addOption(
+        //     'assume-no',
+        //     null,
+        //     Option::NO_VALUE | Option::BOOLEAN,
+        //     'Assume no as answer for all confirmations'
+        // );
     }
 
     /**
-     * Analyses the current inheriting class in order to recieve the configuration options automatically from code.
+     * Analyse the current inheriting class in order to recieve the configuration options automatically from code.
      *
      * @return void
      * @throws \InvalidArgumentException
@@ -230,7 +258,7 @@ class Console extends DefaultApplicationConfig
     }
 
     /**
-     * Configures the application.
+     * Configure the application.
      *
      * @param array $config The application configuration
      * @return void
@@ -280,6 +308,12 @@ class Console extends DefaultApplicationConfig
         }
     }
 
+    /**
+     * Add a command to the configuration.
+     *
+     * @param string $class The command handler class to analyze
+     * @return mixed
+     */
     public function addCommand(string $class)
     {
         Assert::classExists($class, "Command handler class '%s' could not be found!");

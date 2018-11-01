@@ -44,12 +44,14 @@ The following annotations apply to the configuration class instance only.
 
 ### [`App\Version`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Application/Version.php)
 
-Sets the application version.
+Sets the application version string.
 
 ### [`App\DebugMode`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Application/DebugMode.php)
 
-Sets the application in debug-mode.
+Run the application in debug-mode.
+This results in more detailled error output including stack traces and some more debugging-related features.
 
 ### [`App\DisplayName`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Application/DisplayName.php)
 
 Sets the readable form of the application name.
+This gets used on the help page for example.
