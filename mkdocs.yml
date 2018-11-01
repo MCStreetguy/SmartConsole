@@ -45,6 +45,7 @@ pages:
     - Annotations: references/annotations.md
     - IO Component: references/output.md
     - Global Options: references/options.md
+    - Changelog: references/changelog.md
   - Examples:
     - Overview: examples/overview.md
     - Rudimentary Setup: examples/guide.md
