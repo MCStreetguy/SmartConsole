@@ -14,6 +14,7 @@ The main procedure is as follows:
 
 1. The main name of the command is derived from the class name by removing the word `Command` from the end of the name and converting the string to `snake-case`
 2. The main description is read from the class doc-block directly by joining the summary and the description string
+3. The [class annotations](/references/annotations/#global-annotations) get analyzed and their corresponding values set respectively
 
 ### Methods
 

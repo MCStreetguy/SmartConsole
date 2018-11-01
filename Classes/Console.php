@@ -226,6 +226,17 @@ class Console extends DefaultApplicationConfig
         Assert::notEmpty($classDocBlock, "Cannot auto-init '$className' as it contains no valid doc-block to analyze!");
         $classDocBlock = $this->docBlockFactory->create($classDocBlock);
 
+        $helpText = $classSummary = $classDocBlock->getSummary();
+        if (!empty($helpText)) {
+            $classDescription = $classDocBlock->getDescription();
+
+            if (!empty($classDescription)) {
+                $helpText .= PHP_EOL . PHP_EOL . $classDescription;
+            }
+
+            $config['helpText'] = HelpTextUtility::convertToHelpText($helpText);
+        }
+
         /** @var Version|null $versionAnnotation */
         $versionAnnotation = $this->annotationReader->getClassAnnotation($reflector, Version::class);
         if ($versionAnnotation !== null) {
@@ -242,17 +253,6 @@ class Console extends DefaultApplicationConfig
         $logDirAnnotation = $this->annotationReader->getClassAnnotation($reflector, LogDir::class);
         if ($logDirAnnotation !== null) {
             $config['logDir'] = $logDirAnnotation->getPath();
-        }
-
-        $helpText = $classSummary = $classDocBlock->getSummary();
-        if (!empty($helpText)) {
-            $classDescription = $classDocBlock->getDescription();
-
-            if (!empty($classDescription)) {
-                $helpText .= PHP_EOL . PHP_EOL . $classDescription;
-            }
-
-            $config['helpText'] = HelpTextUtility::convertToHelpText($helpText);
         }
 
         $debugModeAnnotation = $this->annotationReader->getClassAnnotation($reflector, DebugMode::class);
