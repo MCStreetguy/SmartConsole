@@ -17,7 +17,7 @@ abstract class AbstractCommand
     /**
      * @var Logger
      */
-    protected $io;
+    protected $logger;
 
     /**
      * @var Args
@@ -67,7 +67,7 @@ abstract class AbstractCommand
     final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
         $this->args = new Args($args);
-        $this->io = new Logger($io, $this->args);
+        $this->logger = new Logger($io, $this->args);
 
         if (method_exists($this, 'prepare')) {
             call_user_func_array([$this, 'prepare'], []);
