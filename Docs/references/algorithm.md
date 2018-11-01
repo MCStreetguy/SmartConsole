@@ -25,7 +25,7 @@ In all other cases a sub-command is created for each of the methods and we got a
 1. The sub-command name is derived from the method name, as with the class name before
 2. If it's not a simple command
     - the description for the sub-command is read from the method doc-block, as with the class doc-block before
-    - If the `@CLI\DefaultCommand` or `@CLI\AnonymousCommand` annotations are present, the sub-command is marked as default and optionally anonymous. (See the [annotation reference](/reference/annotations) for more information)
+    - If the `@CLI\DefaultCommand` or `@CLI\AnonymousCommand` annotations are present, the sub-command is marked as default and optionally anonymous. (See the [annotation reference](/reference/annotations/#command-annotations) for more information)
 
 ### Parameters
 

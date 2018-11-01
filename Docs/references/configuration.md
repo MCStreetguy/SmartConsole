@@ -19,15 +19,15 @@ Below you find a detailled reference of all available configuration options for 
 
 Below you find a detailled reference of all available configuration methods.
 
-### `Console::init()`
+**`Console::init()`**
 
 Initialize the configuration by analyzing the main class and retrieving the needed information from it directly.
 
-### `Console::initFromConfig(array $config)`
+**`Console::initFromConfig(array $config)`**
 
 Initialize the configuration from the given config-array.
 
-### Underlying methods
+**Underlying methods**
 
 All configuration methods from the underlying webmozart/console package are still available throughout SmartConsole.
 Thus you may refer to it's [corresponding documentation](https://github.com/webmozart/console/blob/master/README.md#basic-configuration) to learn more about these _rudimentary_ configuration methods.

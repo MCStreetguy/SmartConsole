@@ -1,6 +1,56 @@
 <h1>IO Component - Method Reference</h1>
 
-In the following you find a detailled explanation of the IO component.
+In the following you find a detailled explanation of the logging component.
+
+---------------------------
+
+## [Logger](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Utility/Logger.php) methods
+
+- **`logDebug($message, array $context = [])`**
+    
+    Add a debug message to the logfile directly.
+
+    -------
+    
+- **`logInfo($message, array $context = [])`**
+    
+    Add an info to the logfile directly.
+
+    -------
+
+- **`logNotice($message, array $context = [])`**
+    
+    Add a notice to the logfile directly.
+
+    -------
+
+- **`logWarning($message, array $context = [])`**
+    
+    Add a warning to the logfile directly.
+
+    -------
+
+- **`logError($message, array $context = [])`**
+    
+    Add an error message to the logfile directly.
+
+    -------
+
+- **`logCritical($message, array $context = [])`**
+    
+    Add a critical event to the logfile directly.
+
+    -------
+
+- **`logAlert($message, array $context = [])`**
+    
+    Add an alert to the logfile directly.
+
+    -------
+
+- **`logEmergency($message, array $context = [])`**
+    
+    Add an emergency event to the logfile directly.
 
 ---------------------------
 
@@ -112,7 +162,147 @@ In the following you find a detailled explanation of the IO component.
 
 ## [IO](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Utility/IO.php) methods
 
-_(to be written)_
+- **`setInteractive(bool $interactive)`**
+
+    Set the interactiveness of the application.
+
+    -------
+
+- **`isInteractive()`**
+
+    Get if the application runs in interactive mode.
+
+    -------
+
+- **`setVerbosity(int $verbosity)`**
+
+    Set the verbosity of the application.
+
+    -------
+
+- **`getVerbosity()`**
+
+    Get the verbosity of the application.
+
+    -------
+
+- **`isNormal()`**
+
+    Get if the application runs with normal verbosity.
+
+    -------
+
+- **`isVerbose()`**
+
+    Get if the application runs in verbose mode.
+
+    -------
+
+- **`isVeryVerbose()`**
+
+    Get if the application runs in very verbose mode.
+
+    -------
+
+- **`isDebug()`**
+
+    Get if the application runs in debug mode.
+
+    -------
+
+- **`setQuiet(bool $quiet)`**
+
+    Set if the application runs in quiet mode.
+
+    -------
+
+- **`isQuiet()`**
+
+    Get if the application runs in quiet mode.
+    
+    -------
+
+- **`setNoAnsi(bool $noAnsi)`**
+
+    Set the surpression of ANSI-output.
+
+    -------
+
+- **`isNoAnsi()`**
+
+    Get if ANSI-output is beeing surpressed.
+
+    -------
+
+- **`setAssumeYes(bool $assumeYes)`**
+
+    Set if the application shall assume 'yes' for questions in quiet mode.
+
+    -------
+
+- **`isYesAssumed()`**
+
+    Get if the application assumes 'yes' for questions in quiet mode.
+
+    -------
+
+- **`prompt(string $question, bool $forceAnswer = false, string $default = null, bool $hint = false, bool $multiline = false, bool $hidden = false, string $color = 'yellow', string $background = null, string $hintColor = 'cyan', string $hintBackground = null)`**
+
+    -------
+
+- **`choose(string $question, array $answers, string $default = null, bool $hint = false, bool $strict = false, string $color = 'yellow', string $background = null)`**
+
+    -------
+
+- **`confirm(string $question, string $color = 'yellow', string $background = null)`**
+
+    -------
+
+- **`checkboxes(string $question, array $options)`**
+
+    -------
+
+- **`radiobuttons(string $question, array $options)`**
+
+    -------
+
+- **`simpleTable(array $data, bool $borderless = false)`**
+
+    -------
+
+- **`table(array $data, bool $borderless = false)`**
+
+    -------
+    
+- **`columns(array $data, int $count = null, string $color = null, string $background = null)`**
+
+    -------
+    
+- **`padding(array $data, $size = '+5', string $character = null, string $color = null, string $background = null, string $resultColor = null, string $resultBackground = null)`**
+
+    -------
+    
+- **`border(string $pattern = null, int $size = null, string $color = null, string $background = null)`**
+
+    -------
+    
+- **`startProgressBar(int $total = 100, string $color = null, string $background = null)`**
+
+    -------
+    
+- **`setProgress(int $progress, string $label = null)`**
+
+    -------
+    
+- **`advanceProgress(int $step, string $label = null)`**
+
+    -------
+    
+- **`finishProgress(string $label = null)`**
+
+    -------
+    
+- **`paddedBox(string $message, int $padding = 2, int $margin = 0, string $color = null, string $background = null)`**
 
 ---------------------------
 
@@ -126,7 +316,7 @@ The main differences are as following:
 
 - `RawIO` ignores any verbosity or quiet flag. Any message will always appear in the terminal unless you mute the application through [piping](https://en.wikipedia.org/wiki/Pipeline_(Unix)) to a [null-device](https://en.wikipedia.org/wiki/Null_device).
 - `RawIO` does not allow any input or dynamic output to ensure functionality even in case of a fatal startup error.
-- `RawIO` could be instantiated directly, whereas the `IO` class requires additional dependencies to be handed over.
+- `RawIO` can be instantiated directly, whereas the `IO` class requires additional dependencies to be handed over.
 
 !!! tip "Developers Note"
     It will be extremely rare for you to have to use `RawIO` directly.
