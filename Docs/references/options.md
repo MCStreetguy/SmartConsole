@@ -3,7 +3,7 @@
 The following options are automatically made available through SmartConsole in the global context:
 
 | Name | Short | Description |
-|------------------|-------|---------------------------------------------------------------------------------------------------------------|
+|:----:|:-----:|:------------|
 | `--help` | `-h` | Display help about the command |
 | `--quiet` | `-q` | Do not output any message |
 | `--verbose` | `-v` / `-vv` / `-vvv` | Increase the verbosity of messages |
@@ -11,6 +11,7 @@ The following options are automatically made available through SmartConsole in t
 | `--ansi` |  | Force ANSI output |
 | `--no-ansi` |  | Disable ANSI output |
 | `--no-interaction` | `-n` | Do not ask any interactive question |
+| `--assume-yes` | `-y` | Assume 'yes' as answer for all confirmations. |
 
 !!! note "Developers Note"
     Normally, all of these options get processed in the background, so you don't have to worry about them.

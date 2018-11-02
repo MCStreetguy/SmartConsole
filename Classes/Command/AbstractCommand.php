@@ -5,9 +5,9 @@ namespace MCStreetguy\SmartConsole\Command;
 use Webmozart\Console\Api\Args\Args as ArgsApi;
 use Webmozart\Console\Api\IO\IO as IOApi;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
-use MCStreetguy\SmartConsole\Utility\Logger;
 use MCStreetguy\SmartConsole\Utility\Args;
 use Webmozart\Console\Api\Command\Command;
+use MCStreetguy\SmartConsole\Utility\IO;
 
 /**
  * The base class for command handlers.
@@ -15,7 +15,7 @@ use Webmozart\Console\Api\Command\Command;
 abstract class AbstractCommand
 {
     /**
-     * @var Logger
+     * @var IO
      */
     protected $logger;
 
@@ -67,7 +67,7 @@ abstract class AbstractCommand
     final public function invoke(ArgsApi $args, IOApi $io, Command $cmd, string $name) : int
     {
         $this->args = new Args($args);
-        $this->logger = new Logger($io, $this->args);
+        $this->logger = new IO($io, $this->args);
 
         if (method_exists($this, 'prepare')) {
             call_user_func_array([$this, 'prepare'], []);

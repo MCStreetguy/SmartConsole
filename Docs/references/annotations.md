@@ -55,7 +55,3 @@ This results in more detailled error output including stack traces and some more
 
 Sets the readable form of the application name.
 This gets used on the help page for example.
-
-### [`App\LogDir`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Application/LogDir.php)
-
-Sets the global logfile directory.
