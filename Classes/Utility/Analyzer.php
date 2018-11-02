@@ -6,13 +6,14 @@ use DI\Container;
 use Doctrine\Common\Annotations\AnnotationReader;
 use MCStreetguy\SmartConsole\Annotations\Command\AnonymousCommand;
 use MCStreetguy\SmartConsole\Annotations\Command\DefaultCommand;
+use MCStreetguy\SmartConsole\Annotations\Command\ShortName;
 use MCStreetguy\SmartConsole\Command\AbstractCommand;
 use MCStreetguy\SmartConsole\Console;
 use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
 use MCStreetguy\SmartConsole\Utility\Helper\StringHelper;
 use MCStreetguy\SmartConsole\Utility\Misc\HelpTextUtility;
-use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use Webmozart\Assert\Assert;
 use Webmozart\Console\Api\Args\Format\Argument;
 use Webmozart\Console\Api\Args\Format\Option;
@@ -88,7 +89,7 @@ class Analyzer
 
         $command->setDescription($summary);
 
-        if (!empty($description = (string)$classDocBlock->getDescription())) {
+        if (!empty($description = (string) $classDocBlock->getDescription())) {
             // $description = HelpTextUtility::convertToHelpText($description);
             $command->setHelp($description);
         }
@@ -103,7 +104,7 @@ class Analyzer
         Assert::notEmpty($methods, "The command handler class '$class' defines no valid methods!");
 
         $actionMethods = array_filter($methods, function (\ReflectionMethod $elem) {
-            return (bool)preg_match('/Action$/', $elem->getName());
+            return (bool) preg_match('/Action$/', $elem->getName());
         });
 
         Assert::notEmpty($actionMethods, "The command handler class '$class' defines no valid action methods!");
@@ -158,7 +159,7 @@ class Analyzer
         Assert::notEmpty($commandSummary, "The action method doc-block for '$cmdName' in '$class' is missing a summary!");
         $config->setDescription($commandSummary);
 
-        $commandDescription = (string)$methodDocBlock->getDescription();
+        $commandDescription = (string) $methodDocBlock->getDescription();
 
         if (!empty($commandDescription)) {
             $commandDescription = HelpTextUtility::convertToHelpText($commandDescription);
@@ -178,7 +179,7 @@ class Analyzer
 
             if (!empty($paramTags)) {
                 $paramTag = $paramTags[0];
-                $description = (string)$paramTag->getDescription();
+                $description = (string) $paramTag->getDescription();
             }
 
             if ($parameter->isOptional()) {
@@ -188,8 +189,8 @@ class Analyzer
 
                 Assert::false($this->hasOption($optionName, $config), "An option with the name '$optionName' has already been declared!");
 
-                $shortNameMap = array_filter($this->annotationReader->getMethodAnnotations($method), function ($elem) use ($optionName) {
-                    return ($elem instanceof ShortName) && ($elem->getOption() === $optionName);
+                $shortNameMap = array_filter($this->annotationReader->getMethodAnnotations($method), function ($elem) use ($name) {
+                    return ($elem instanceof ShortName) && ($elem->getOption() === $name);
                 });
 
                 if (!empty($shortNameMap)) {
@@ -248,7 +249,7 @@ class Analyzer
                 if ($parameter->hasType()) {
                     $type = $parameter->getType();
 
-                    switch ((string)$type) {
+                    switch ((string) $type) {
                         case 'boolean':
                             $flags = $flags | Argument::BOOLEAN;
                             break;
@@ -292,7 +293,7 @@ class Analyzer
      * @param ApplicationConfig $config The configuration instance to search in
      * @return bool
      */
-    protected function hasCommand(string $name, ApplicationConfig $config) : bool
+    protected function hasCommand(string $name, ApplicationConfig $config): bool
     {
         try {
             $config->getCommandConfig($name);
@@ -310,7 +311,7 @@ class Analyzer
      * @param Config $config The configuration instance to search in
      * @return bool
      */
-    protected function hasOption(string $name, Config $config) : bool
+    protected function hasOption(string $name, Config $config): bool
     {
         foreach ($config->getOptions() as $option) {
             if ($option->getLongName() === $name || $option->getShortName() === $name) {
@@ -328,7 +329,7 @@ class Analyzer
      * @param Config $config The configuration instance to search in
      * @return bool
      */
-    protected function hasArgument(string $name, Config $config) : bool
+    protected function hasArgument(string $name, Config $config): bool
     {
         foreach ($config->getArguments() as $argument) {
             if ($argument->getName() === $name) {
