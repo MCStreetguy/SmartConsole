@@ -345,8 +345,12 @@ class IO extends RawIO
      */
     public function confirm(string $question, string $color = 'yellow', string $background = null): bool
     {
+        if ($this->assumeYes === true) {
+            return true;
+        }
+
         if ($this->isQuiet() || !$this->isInteractive()) {
-            return $this->assumeYes;
+            return false;
         }
 
         $confirmation = $this->climate($color, $background)->confirm($question);
@@ -360,7 +364,7 @@ class IO extends RawIO
      *
      * @param string $question The message to display to the user before prompting
      * @param array $options The possible answer the user may choose between
-     * @return string
+     * @return string|null
      */
     public function checkboxes(string $question, array $options)
     {
@@ -379,7 +383,7 @@ class IO extends RawIO
      *
      * @param string $question The message to display to the user before prompting
      * @param array $options The possible answer the user may choose between
-     * @return string
+     * @return string|null
      */
     public function radiobuttons(string $question, array $options)
     {
