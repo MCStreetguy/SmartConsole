@@ -2,6 +2,8 @@
 
 namespace MCStreetguy\SmartConsole\Utility\Misc;
 
+use const PHP_EOL as EOL;
+
 abstract class HelpTextUtility
 {
     public static function convertToHelpText(string $input)
@@ -11,7 +13,7 @@ abstract class HelpTextUtility
             '/\n\n/'
         ], [
             ' ',
-            '\n'
+            EOL
         ], $input);
     }
 }
