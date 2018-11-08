@@ -132,7 +132,8 @@ class IO extends RawIO
      */
     public function isVerbose(): bool
     {
-        return $this->io->isVerbose();
+        // return $this->io->isVerbose();
+        return $this->io->getVerbosity() >= self::VERBOSE;
     }
 
     /**
@@ -142,7 +143,8 @@ class IO extends RawIO
      */
     public function isVeryVerbose(): bool
     {
-        return $this->io->isVeryVerbose();
+        // return $this->io->isVeryVerbose();
+        return $this->io->getVerbosity() >= self::VERY_VERBOSE;
     }
 
     /**
@@ -152,7 +154,8 @@ class IO extends RawIO
      */
     public function isDebug(): bool
     {
-        return $this->io->isDebug();
+        // return $this->io->isDebug();
+        return $this->io->getVerbosity() >= self::DEBUG;
     }
 
     /**
@@ -162,7 +165,7 @@ class IO extends RawIO
      */
     public function isNormal(): bool
     {
-        return $this->getVerbosity() === 0;
+        return $this->getVerbosity() >= self::NORMAL;
     }
 
     /**
