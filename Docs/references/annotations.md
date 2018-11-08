@@ -36,6 +36,12 @@ Defines a short name for an option.
 
 This annotation gets silently ignored if the given target name is not defined or not an option.
 
+### [`CLI\OptionalArgument`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Command/OptionalArgument.php)
+
+Enforces an parameter to be turned into an optional argument instead of an option.
+
+If the target parameter is not present or not optional this annotation will be silently ignored.
+
 ---------------------------
 
 ## Global Annotations

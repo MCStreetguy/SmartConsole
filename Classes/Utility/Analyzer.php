@@ -21,6 +21,7 @@ use Webmozart\Console\Api\Command\NoSuchCommandException;
 use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Api\Config\Config;
+use MCStreetguy\SmartConsole\Annotations\Command\OptionalArgument;
 
 class Analyzer
 {
@@ -182,7 +183,11 @@ class Analyzer
                 $description = (string) $paramTag->getDescription();
             }
 
-            if ($parameter->isOptional()) {
+            $optionalArgumentMap = array_filter($this->annotationReader->getMethodAnnotations($method), function ($elem) use ($name) {
+                return ($elem instanceof OptionalArgument) && ($elem->getArgument() === $name);
+            });
+
+            if ($parameter->isOptional() && empty($optionalArgumentMap)) {
                 $defaultValue = $parameter->getDefaultValue();
 
                 $optionName = StringHelper::camelToSnakeCase($name);
@@ -244,7 +249,7 @@ class Analyzer
             } else {
                 Assert::false($this->hasArgument($name, $config), "An argument with the name '$name' has already been declared!");
 
-                $flags = Argument::REQUIRED;
+                $flags = !empty($optionalArgumentMap) ? Argument::OPTIONAL : Argument::REQUIRED;
 
                 if ($parameter->hasType()) {
                     $type = $parameter->getType();
