@@ -191,6 +191,7 @@ class Analyzer
                 $defaultValue = $parameter->getDefaultValue();
 
                 $optionName = StringHelper::camelToSnakeCase($name);
+                $flags = Option::NULLABLE;
 
                 Assert::false($this->hasOption($optionName, $config), "An option with the name '$optionName' has already been declared!");
 
@@ -200,10 +201,10 @@ class Analyzer
 
                 if (!empty($shortNameMap)) {
                     $shortName = $shortNameMap[0]->getShort();
-                    $flags = Option::PREFER_SHORT_NAME;
+                    $flags = $flags | Option::PREFER_SHORT_NAME;
                 } else {
                     $shortName = null;
-                    $flags = Option::PREFER_LONG_NAME;
+                    $flags = $flags | Option::PREFER_LONG_NAME;
                 }
 
                 if ($parameter->hasType()) {
@@ -249,7 +250,11 @@ class Analyzer
             } else {
                 Assert::false($this->hasArgument($name, $config), "An argument with the name '$name' has already been declared!");
 
-                $flags = !empty($optionalArgumentMap) ? Argument::OPTIONAL : Argument::REQUIRED;
+                if (empty($optionalArgumentMap)) {
+                    $flags = Argument::REQUIRED;
+                } else {
+                    $flags = Argument::OPTIONAL | Argument::NULLABLE;
+                }
 
                 if ($parameter->hasType()) {
                     $type = $parameter->getType();
