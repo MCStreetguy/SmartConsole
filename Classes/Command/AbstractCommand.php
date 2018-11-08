@@ -8,6 +8,7 @@ use MCStreetguy\SmartConsole\Exceptions\ConfigurationException;
 use MCStreetguy\SmartConsole\Utility\Args;
 use Webmozart\Console\Api\Command\Command;
 use MCStreetguy\SmartConsole\Utility\IO;
+use MCStreetguy\SmartConsole\Annotations\Command\OptionalArgument;
 
 /**
  * The base class for command handlers.
@@ -81,7 +82,11 @@ abstract class AbstractCommand
         foreach ($params as $parameter) {
             $param = $parameter->getName();
 
-            if ($parameter->isOptional()) {
+            $optionalArgumentMap = array_filter((new AnnotationReader)->getMethodAnnotations($reflector), function ($elem) use ($param) {
+                return ($elem instanceof OptionalArgument) && ($elem->getArgument() === $param);
+            });
+
+            if ($parameter->isOptional() && empty($optionalArgumentMap)) {
                 $optionName = preg_replace_callback('/(?<=.)([A-Z])/', function ($matches) {
                     return '-' . strtolower($matches[1]);
                 }, $param);
@@ -96,7 +101,7 @@ abstract class AbstractCommand
 
         if (is_int($result)) {
             if ($result > 255) {
-                $result = 255;
+                $result = $result % 255;
             }
 
             return $result;
