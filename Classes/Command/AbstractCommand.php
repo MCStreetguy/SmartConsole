@@ -9,6 +9,7 @@ use MCStreetguy\SmartConsole\Utility\Args;
 use Webmozart\Console\Api\Command\Command;
 use MCStreetguy\SmartConsole\Utility\IO;
 use MCStreetguy\SmartConsole\Annotations\Command\OptionalArgument;
+use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
  * The base class for command handlers.
