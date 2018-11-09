@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Added**
 
 - Automated app-configuration by reflecting the main class
-- Simple command definition through reflection of the command handler classes
-- Basic configuration annotations
+- Simple command definition through reflection of the command handlers
+- Advanced configuration annotations
 - Comprehensive and dynamic input-output system
 - Global dependency injection container
 - Error and exception handlers with enduser-friendly output formatting
