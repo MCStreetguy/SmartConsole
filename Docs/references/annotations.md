@@ -42,6 +42,12 @@ Enforces an parameter to be turned into an optional argument instead of an optio
 
 If the target parameter is not present or not optional this annotation will be silently ignored.
 
+### [`CLI\Aliases`](https://github.com/MCStreetguy/SmartConsole/blob/master/Classes/Annotations/Command/Aliases.php)
+
+Defines a list of names that shall be registered as aliases for the (sub)command.
+
+All aliases must only contain letters, digits and hyphens. Otherwise an exception is thrown.
+
 ---------------------------
 
 ## Global Annotations

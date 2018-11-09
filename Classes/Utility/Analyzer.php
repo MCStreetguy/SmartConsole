@@ -22,6 +22,7 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Api\Config\Config;
 use MCStreetguy\SmartConsole\Annotations\Command\OptionalArgument;
+use MCStreetguy\SmartConsole\Annotations\Command\Aliases;
 
 class Analyzer
 {
@@ -116,6 +117,19 @@ class Analyzer
 
             $command->setHandlerMethod("${cmdName}Cmd");
 
+            $aliases = $this->annotationReader->getMethodAnnotation($method, Aliases::class);
+            if ($aliases !== null) {
+                $aliasMap = $aliases->getNames();
+
+                Assert::allRegex(
+                    $aliasMap,
+                    '/^[0-9a-zA-Z-]+$/',
+                    'Alias names may only contain letters, digits and hyphens! Got: %s'
+                );
+
+                $command->setAliases($aliasMap);
+            }
+
             $this->addArgsAndOptions($command, $method, $class);
         } else {
             foreach ($actionMethods as $method) {
@@ -130,6 +144,19 @@ class Analyzer
                     if ($this->annotationReader->getMethodAnnotation($method, AnonymousCommand::class) !== null) {
                         $subCommand->markAnonymous();
                     }
+                }
+
+                $aliases = $this->annotationReader->getMethodAnnotation($method, Aliases::class);
+                if ($aliases !== null) {
+                    $aliasMap = $aliases->getNames();
+
+                    Assert::allRegex(
+                        $aliasMap,
+                        '/^[0-9a-zA-Z-]+$/',
+                        'Alias names may only contain letters, digits and hyphens! Got: %s'
+                    );
+
+                    $subCommand->setAliases($aliasMap);
                 }
 
                 $this->addArgsAndOptions($subCommand, $method, $class);
