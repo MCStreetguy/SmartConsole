@@ -704,39 +704,45 @@ class IO extends RawIO
             for ($i=0; $i < $margin; $i++) {
                 $tmp .= ' ';
             }
-            $margin = $tmp;
+            $marginText = $tmp;
         } else {
-            $margin = '';
+            $marginText = '';
         }
 
         if ($padding > 2) {
             $tmp = '';
             for ($i=0; $i < $padding; $i++) {
-                $tmp += ' ';
+                $tmp .= ' ';
             }
-            $padding = $tmp;
+            $paddingText = $tmp;
         } else {
-            $padding = '  ';
+            $paddingText = '  ';
         }
 
-        $this->inline($margin);
+        $this->inline($marginText);
         for ($i=0; $i < $maxLength; $i++) {
             $this->inline(' ', [], $color, $background);
         }
-        $this->inline(PHP_EOL);
+        $this->newline();
 
         foreach ($lines as $line) {
-            $this->inline($margin);
-            $this->inline($padding, [], $color, $background);
-            $this->out($line, [], $color, $background);
-            $this->inline($padding, [], $color, $background);
+            $this->inline($marginText);
+            $this->inline($paddingText, [], $color, $background);
+            $this->inline($line, [], $color, $background);
+
+            for ($i = strlen($line); $i < ($maxLength - $padding * 2); $i++) {
+                $this->inline(' ', [], $color, $background);
+            }
+
+            $this->inline($paddingText, [], $color, $background);
+            $this->newline();
         }
 
-        $this->inline($margin);
+        $this->inline($marginText);
         for ($i = 0; $i < $maxLength; $i++) {
             $this->inline(' ', [], $color, $background);
         }
-        $this->inline(PHP_EOL);
+        $this->newline();
     }
 
     // Override parent methods with more complex functionality
