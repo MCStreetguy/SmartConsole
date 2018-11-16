@@ -721,14 +721,14 @@ class IO extends RawIO
 
         $this->inline($margin);
         for ($i=0; $i < $maxLength; $i++) {
-            $this->inline(' ', $context, $color, $background);
+            $this->inline(' ', [], $color, $background);
         }
         $this->inline(PHP_EOL);
 
         foreach ($lines as $line) {
             $this->inline($margin);
             $this->inline($padding, [], $color, $background);
-            $this->out($line, $context, $color, $background);
+            $this->out($line, [], $color, $background);
             $this->inline($padding, [], $color, $background);
         }
 
