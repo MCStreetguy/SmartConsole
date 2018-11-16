@@ -702,7 +702,7 @@ class IO extends RawIO
         if ($margin !== null && $margin > 0) {
             $tmp = '';
             for ($i=0; $i < $margin; $i++) {
-                $tmp += ' ';
+                $tmp .= ' ';
             }
             $margin = $tmp;
         } else {
