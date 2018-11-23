@@ -683,7 +683,7 @@ class IO extends RawIO
      */
     public function paddedBox(
         string $message,
-        int $padding = 2,
+        int $padding = 3,
         int $margin = 0,
         string $color = null,
         string $background = null
