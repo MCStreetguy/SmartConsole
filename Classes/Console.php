@@ -29,6 +29,8 @@ use Webmozart\Console\Api\Config\ApplicationConfig;
 use Webmozart\Console\Api\Config\CommandConfig;
 use Webmozart\Console\Config\DefaultApplicationConfig;
 use Webmozart\Console\ConsoleApplication;
+use Webmozart\Console\Api\Event\ConsoleEvents;
+use Webmozart\Console\Handler\Help\HelpHandler;
 
 class Console extends DefaultApplicationConfig
 {
@@ -150,7 +152,7 @@ class Console extends DefaultApplicationConfig
         // Add user definition files if available
         if (property_exists(static::class, 'factoryDefinitions') &&
             !empty(static::$factoryDefinitions) &&
-            is_array(static::$factoryDefinitions)
+            is_[static::$factoryDefinitions]
         ) {
             foreach (static::$factoryDefinitions as $file) {
                 Assert::file($file, "The definition source '%s' is no file!");
@@ -194,7 +196,31 @@ class Console extends DefaultApplicationConfig
      */
     protected function configure()
     {
-        parent::configure();
+        // Don't call the parent configuration method, instead set that config directly to enable modification!
+        $this->setIOFactory([$this, 'createIO'])
+            ->addEventListener(ConsoleEvents::PRE_RESOLVE, [$this, 'resolveHelpCommand'])
+            ->addEventListener(ConsoleEvents::PRE_HANDLE, [$this, 'printVersion'])
+            ->addOption('help', 'h', Option::NO_VALUE, 'Display help about the command')
+            ->addOption('quiet', 'q', Option::NO_VALUE, 'Do not output any message')
+            ->addOption('verbose', 'v', Option::OPTIONAL_VALUE, 'Increase the verbosity of messages: "-v" for verbose output, "-vv" for even more verbose output and "-vvv" for debug', null, 'level')
+            ->addOption('version', 'V', Option::NO_VALUE, 'Display this application version')
+            ->addOption('ansi', null, Option::NO_VALUE, 'Force ANSI output')
+            ->addOption('no-ansi', null, Option::NO_VALUE, 'Disable ANSI output')
+            ->addOption('no-interaction', 'n', Option::NO_VALUE, 'Do not ask any interactive question')
+            ->beginCommand('help')
+                ->markDefault()
+                ->setDescription('Display the manual of a command')
+                ->addArgument('command', Argument::OPTIONAL, 'The command name')
+                ->addOption('man', 'm', Option::NO_VALUE, 'Output the help as man page')
+                ->addOption('ascii-doc', null, Option::NO_VALUE, 'Output the help as AsciiDoc document')
+                ->addOption('text', 't', Option::NO_VALUE, 'Output the help as plain text')
+                ->addOption('xml', 'x', Option::NO_VALUE, 'Output the help as XML')
+                ->addOption('json', 'j', Option::NO_VALUE, 'Output the help as JSON')
+                ->setHandler(function () {
+                    return new HelpHandler();
+                })
+            ->end();
+        // parent::configure();
 
         $this->addOption(
             'assume-yes',
@@ -315,5 +341,13 @@ class Console extends DefaultApplicationConfig
         Assert::classExists($class, "Command handler class '%s' could not be found!");
 
         return $this->analyzer->addCommand($class, $this);
+    }
+
+    // Override parent methods with additional logic
+
+    public function printVersion(\Webmozart\Console\Api\Event\PreHandleEvent $event)
+    {
+        parent::printVersion($event);
+        die;
     }
 }

@@ -159,7 +159,7 @@ class IO extends RawIO
     }
 
     /**
-     * Get if the IO is in normal mode (the application has not been run with any '-v*' flag).
+     * Get if the IO is in normal mode (the application has been run without any '-v*' flag).
      *
      * @return bool
      */
