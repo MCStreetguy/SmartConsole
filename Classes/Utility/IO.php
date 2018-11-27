@@ -683,7 +683,7 @@ class IO extends RawIO
      */
     public function paddedBox(
         string $message,
-        int $padding = 2,
+        int $padding = 3,
         int $margin = 0,
         string $color = null,
         string $background = null
@@ -702,41 +702,47 @@ class IO extends RawIO
         if ($margin !== null && $margin > 0) {
             $tmp = '';
             for ($i=0; $i < $margin; $i++) {
-                $tmp += ' ';
+                $tmp .= ' ';
             }
-            $margin = $tmp;
+            $marginText = $tmp;
         } else {
-            $margin = '';
+            $marginText = '';
         }
 
         if ($padding > 2) {
             $tmp = '';
             for ($i=0; $i < $padding; $i++) {
-                $tmp += ' ';
+                $tmp .= ' ';
             }
-            $padding = $tmp;
+            $paddingText = $tmp;
         } else {
-            $padding = '  ';
+            $paddingText = '  ';
         }
 
-        $this->inline($margin);
+        $this->inline($marginText);
         for ($i=0; $i < $maxLength; $i++) {
-            $this->inline(' ', $context, $color, $background);
+            $this->inline(' ', [], $color, $background);
         }
-        $this->inline(PHP_EOL);
+        $this->newline();
 
         foreach ($lines as $line) {
-            $this->inline($margin);
-            $this->inline($padding, [], $color, $background);
-            $this->out($line, $context, $color, $background);
-            $this->inline($padding, [], $color, $background);
+            $this->inline($marginText);
+            $this->inline($paddingText, [], $color, $background);
+            $this->inline($line, [], $color, $background);
+
+            for ($i = strlen($line); $i < ($maxLength - $padding * 2); $i++) {
+                $this->inline(' ', [], $color, $background);
+            }
+
+            $this->inline($paddingText, [], $color, $background);
+            $this->newline();
         }
 
-        $this->inline($margin);
+        $this->inline($marginText);
         for ($i = 0; $i < $maxLength; $i++) {
             $this->inline(' ', [], $color, $background);
         }
-        $this->inline(PHP_EOL);
+        $this->newline();
     }
 
     // Override parent methods with more complex functionality
